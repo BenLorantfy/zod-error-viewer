@@ -4,6 +4,9 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 8
       - uses: actions/checkout@v4
       # TODO: add caching
       - run: pnpm install
