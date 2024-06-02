@@ -186,7 +186,7 @@ function getMissingKeysError(error: ZodError, objPath: Array<string | number>) {
         message:
           keys.length === 1
             ? `Object missing required key: ${keys[0]}`
-            : `Object missing required keys: ${keys.join(", ")}`,
+            : `Object missing required keys: ${keys.map((key) => `'${key}'`).join(", ")}`,
       },
     ]);
   }
