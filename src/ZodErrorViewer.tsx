@@ -52,8 +52,14 @@ function RecursiveViewer({
   lineNum?: number;
   path: Array<string | number>;
 }) {
-  // TODO: default this correctly
-  const [selectedUnionError, setSelectedUnionError] = useState<ZodError>();
+  const [unionErrorIndex, setSelectedUnionErrorIndex] = useState(0);
+
+  const unionError = getUnionError({
+    error,
+    path,
+    index: unionErrorIndex,
+  });
+
   if (typeof data !== "object" || data === null) {
     return (
       <Line
@@ -64,8 +70,8 @@ function RecursiveViewer({
         indentation={indentation}
         path={path}
         error={error}
-        onSelectUnionError={setSelectedUnionError}
-        selectedUnionError={selectedUnionError}
+        onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
+        unionErrorIndex={unionErrorIndex}
       />
     );
   }
@@ -81,8 +87,8 @@ function RecursiveViewer({
           indentation={indentation}
           path={path}
           error={error}
-          onSelectUnionError={setSelectedUnionError}
-          selectedUnionError={selectedUnionError}
+          onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
+          unionErrorIndex={unionErrorIndex}
         />
         {data.map((value, i) => {
           runningLineNum += i === 0 ? 1 : countLines(data[i - 1]);
@@ -90,7 +96,7 @@ function RecursiveViewer({
             <RecursiveViewer
               key={i}
               data={value}
-              error={selectedUnionError || error}
+              error={unionError || error}
               comma={i !== data.length - 1}
               indentation={indentation + 1}
               lineNum={runningLineNum}
@@ -121,8 +127,8 @@ function RecursiveViewer({
         indentation={indentation}
         path={path}
         error={error}
-        onSelectUnionError={setSelectedUnionError}
-        selectedUnionError={selectedUnionError}
+        onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
+        unionErrorIndex={unionErrorIndex}
       />
       {entries.map(([key, value], i) => {
         runningLineNum += i === 0 ? 1 : countLines(entries[i - 1]?.[1]);
@@ -131,7 +137,7 @@ function RecursiveViewer({
             key={key}
             propertyKey={key}
             data={value}
-            error={selectedUnionError || error}
+            error={unionError || error}
             comma={i !== entries.length - 1}
             indentation={indentation + 1}
             lineNum={runningLineNum}
@@ -154,6 +160,24 @@ function RecursiveViewer({
   );
 }
 
+function getUnionError({
+  error,
+  path,
+  index,
+}: {
+  error?: ZodError;
+  path?: Array<string | number>;
+  index: number;
+}) {
+  const issues =
+    error?.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
+    [];
+  const issue = issues[0];
+  return issue?.code === ZodIssueCode.invalid_union
+    ? issue?.unionErrors[index]
+    : undefined;
+}
+
 function Line({
   num,
   value,
@@ -163,8 +187,8 @@ function Line({
   indentation = 0,
   comma,
   path,
-  selectedUnionError,
-  onSelectUnionError,
+  unionErrorIndex = 0,
+  onSelectUnionErrorIndex,
 }: {
   num: number;
   value?: unknown;
@@ -174,20 +198,18 @@ function Line({
   indentation?: number;
   comma?: boolean;
   path?: Array<string | number>;
-  selectedUnionError?: ZodError;
-  onSelectUnionError?: (err: ZodError) => void;
+  unionErrorIndex?: number;
+  onSelectUnionErrorIndex?: (err: number) => void;
 }) {
   const issues =
     error?.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
     [];
   const issue = issues[0];
-
-  const unionIndex =
-    !selectedUnionError || !issue || issue.code !== ZodIssueCode.invalid_union
-      ? 0
-      : issue.unionErrors.findIndex(
-          (unionError) => unionError === selectedUnionError,
-        );
+  const unionError = getUnionError({
+    error,
+    path,
+    index: unionErrorIndex,
+  });
 
   return (
     <div
@@ -263,19 +285,19 @@ function Line({
               {issue.code === ZodIssueCode.invalid_union && (
                 <>
                   <ErrorSwitcher
-                    index={unionIndex}
+                    index={unionErrorIndex}
                     max={issue.unionErrors.length}
                     // TODO: Remove null assertions
                     onPrev={() =>
-                      onSelectUnionError?.(issue.unionErrors[unionIndex - 1]!)
+                      onSelectUnionErrorIndex?.(unionErrorIndex - 1)
                     }
                     onNext={() =>
-                      onSelectUnionError?.(issue.unionErrors[unionIndex + 1]!)
+                      onSelectUnionErrorIndex?.(unionErrorIndex + 1)
                     }
                   />
                   {`: `}
                   {
-                    issue.unionErrors[unionIndex]!.issues.find(
+                    unionError?.issues.find(
                       (issue) => issue.path.join(".") === path?.join("."),
                     )?.message
                   }
