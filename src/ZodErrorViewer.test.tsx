@@ -3,11 +3,11 @@
 import { test, expect, beforeEach } from "vitest";
 import Meta, * as stories from "./ZodErrorViewer.stories";
 import { composeStories } from "@storybook/react";
-import { render, screen, cleanup } from "@testing-library/react";
+import { render, screen, cleanup, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { z } from "zod";
 
-const { Basic, Unions } = composeStories(stories, Meta);
+const { Basic, Unions, NestedUnions } = composeStories(stories, Meta);
 
 beforeEach(cleanup);
 
@@ -57,7 +57,7 @@ test("renders correctly for unions", async () => {
   `);
 });
 
-test("renders correctly for unions", async () => {
+test("renders correctly for unions when no entry has a root level error", async () => {
   const data = {
     person: {
       name: "Han Solo",
@@ -104,6 +104,64 @@ test("renders correctly for unions", async () => {
     4		"age": true // Error: Expected string, received boolean
     5	}
     6}
+    "
+  `);
+});
+
+test("renders correctly for nested unions", async () => {
+  render(<NestedUnions />);
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{ // Error: Invalid union entry 1/2 : Expected string, received object
+    2	"person": {
+    3		"name": "Han Solo",
+    4		"age": 35,
+    5		"sideKicks": [
+    6			{
+    7				"name": "R2-D2"
+    8			}
+    9		]
+    10	}
+    11}
+    "
+  `);
+
+  userEvent.click(screen.getByRole("button", { name: "Next union error" }));
+  await screen.findByText("2/2");
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{ // Error: Invalid union entry 2/2 : 
+    2	"person": {
+    3		"name": "Han Solo",
+    4		"age": 35,
+    5		"sideKicks": [
+    6			{ // Error: Invalid union entry 1/2 : 
+    7				"name": "R2-D2" // Error: Invalid literal value, expected "Chewbacca"
+    8			}
+    9		]
+    10	}
+    11}
+    "
+  `);
+
+  userEvent.click(
+    screen.getAllByRole("button", { name: "Next union error" })[1]!,
+  );
+  await waitFor(() => expect(screen.getAllByText("2/2")).toHaveLength(2));
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{ // Error: Invalid union entry 2/2 : 
+    2	"person": {
+    3		"name": "Han Solo",
+    4		"age": 35,
+    5		"sideKicks": [
+    6			{ // Error: Invalid union entry 2/2 : 
+    7				"name": "R2-D2" // Error: Invalid literal value, expected "Lando Calrissian"
+    8			}
+    9		]
+    10	}
+    11}
     "
   `);
 });

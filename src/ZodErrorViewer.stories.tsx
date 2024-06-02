@@ -72,3 +72,41 @@ export const Unions: Story = {
       .safeParse(unionsData).error!,
   },
 };
+
+const nestedUnionsData = {
+  person: {
+    name: "Han Solo",
+    age: 35,
+    sideKicks: [
+      {
+        name: "R2-D2",
+      },
+    ],
+  },
+};
+export const NestedUnions: Story = {
+  args: {
+    data: nestedUnionsData,
+    error: z
+      .union([
+        z.string(),
+        z.object({
+          person: z.object({
+            name: z.string(),
+            age: z.number(),
+            sideKicks: z.array(
+              z.union([
+                z.object({
+                  name: z.literal("Chewbacca"),
+                }),
+                z.object({
+                  name: z.literal("Lando Calrissian"),
+                }),
+              ]),
+            ),
+          }),
+        }),
+      ])
+      .safeParse(nestedUnionsData).error!,
+  },
+};
