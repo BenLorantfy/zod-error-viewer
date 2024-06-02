@@ -155,11 +155,48 @@ function RecursiveViewer({
         bracket="}"
         indentation={indentation}
         comma={comma}
+        path={path}
+        error={getMissingKeysError(error, path)}
       />
     </>
   );
 }
 
+/**
+ * Constructs a custom error that mentions which keys are missing in an object
+ */
+function getMissingKeysError(error: ZodError, objPath: Array<string | number>) {
+  const missingKeyIssues = error.issues.filter((issue) => {
+    return (
+      issue.code === ZodIssueCode.invalid_type &&
+      issue.received === "undefined" &&
+      issue.message === "Required" &&
+      issue.path.slice(0, issue.path.length - 1).join(".") === objPath.join(".")
+    );
+  });
+
+  if (missingKeyIssues.length > 0) {
+    const keys = missingKeyIssues.map(
+      (issue) => issue.path[issue.path.length - 1],
+    );
+    return new ZodError([
+      {
+        code: ZodIssueCode.custom,
+        path: objPath,
+        message:
+          keys.length === 1
+            ? `Object missing required key: ${keys[0]}`
+            : `Object missing required keys: ${keys.join(", ")}`,
+      },
+    ]);
+  }
+
+  return undefined;
+}
+
+/**
+ * Gets the union error at a specific index
+ */
 function getUnionError({
   error,
   path,

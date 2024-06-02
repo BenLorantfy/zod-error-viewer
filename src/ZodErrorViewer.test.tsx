@@ -7,7 +7,10 @@ import { render, screen, cleanup, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { z } from "zod";
 
-const { Basic, Unions, NestedUnions } = composeStories(stories, Meta);
+const { Basic, Unions, NestedUnions, MissingKeys } = composeStories(
+  stories,
+  Meta,
+);
 
 beforeEach(cleanup);
 
@@ -162,6 +165,20 @@ test("renders correctly for nested unions", async () => {
     9		]
     10	}
     11}
+    "
+  `);
+});
+
+test("renders correctly for missing keys", async () => {
+  render(<MissingKeys />);
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{
+    2	"person": {
+    3		"name": "Han Solo"
+    4	} // Error: Object missing required keys: height, age
+    5}
     "
   `);
 });

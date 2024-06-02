@@ -110,3 +110,23 @@ export const NestedUnions: Story = {
       .safeParse(nestedUnionsData).error!,
   },
 };
+
+const missingKeysData = {
+  person: {
+    name: "Han Solo",
+  },
+};
+export const MissingKeys: Story = {
+  args: {
+    data: missingKeysData,
+    error: z
+      .object({
+        person: z.object({
+          name: z.string(),
+          height: z.number(),
+          age: z.number(),
+        }),
+      })
+      .safeParse(missingKeysData).error!,
+  },
+};
