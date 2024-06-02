@@ -19,6 +19,7 @@ const {
   SizeErrors,
   NotMultipleOfError,
   CustomError,
+  CustomTheme,
 } = composeStories(stories, Meta);
 
 beforeEach(cleanup);
@@ -291,4 +292,8 @@ test("renders custom error message correctly", () => {
     6}
     "
   `);
+});
+
+test("allows passing a custom theme without errors", () => {
+  expect(() => render(<CustomTheme />)).not.toThrow();
 });

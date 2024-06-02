@@ -267,3 +267,45 @@ export const CustomError: Story = {
       .safeParse(customError).error!,
   },
 };
+
+const customThemeData = {
+  myObject: {
+    myStr: "hello",
+    myNum: 42,
+    myBool: true,
+    myNull: null,
+    myArr: ["aaa", 42, true, null],
+  },
+};
+export const CustomTheme: Story = {
+  args: {
+    data: customThemeData,
+    error: z
+      .object({
+        myObject: z.object({
+          myStr: z.string().max(2),
+          myNum: z.number(),
+          myBool: z.boolean(),
+          myNull: z.null(),
+          myArr: z.array(z.union([z.string(), z.number(), z.boolean()])),
+        }),
+      })
+      .safeParse(customThemeData).error!,
+    theme: {
+      background: "#1e1e1e",
+      key: "#a3d2f0",
+      errorBackground: "#30201e",
+      number: "#bacdab",
+      boolean: "#679ad1",
+      null: "#679ad1",
+      undefined: "#679ad1",
+      string: "#c5947c",
+      errorForeground: "#F27878",
+      bracket: "#b09a3b",
+      colon: "#a3d2f0",
+      comma: "#d4d4d4",
+      lineNumberBackground: "#141414",
+      lineNumber: "#848484",
+    },
+  },
+};

@@ -3,21 +3,52 @@
 import { CSSProperties, useState } from "react";
 import { z, ZodError, ZodIssueCode } from "zod";
 
-const theme = {
+const defaultTheme = {
+  lineNumber: "black",
   lineNumberBackground: "#f0f0f0",
-  stringColor: "#95261f",
-  numColor: "#3c845c",
-  booleanColor: "#0e0ef6",
-  nullColor: "#0e0ef6",
-  undefinedColor: "#0e0ef6",
-  keyColor: "#22509f",
-  errorBackgroundColor: "#FFF0F0",
-  errorForegroundColor: "#C71A1A",
+  string: "#95261f",
+  number: "#3c845c",
+  boolean: "#0e0ef6",
+  null: "#0e0ef6",
+  undefined: "#0e0ef6",
+  key: "#22509f",
+  errorBackground: "#FFF0F0",
+  errorForeground: "#C71A1A",
+  background: "#FFFFFF",
+  bracket: "#1330f0",
+  colon: "#22509f",
+  comma: "black",
+};
+
+const buttonStyle = (theme: typeof defaultTheme): CSSProperties => ({
+  appearance: "none",
+  backgroundColor: theme.errorForeground,
+  color: theme.background,
+  border: "none",
+  fontSize: "0.75rem",
+  cursor: "pointer",
+  padding: "2px",
+  paddingLeft: "6px",
+  paddingRight: "6px",
+  userSelect: "none",
+});
+
+const srOnly: CSSProperties = {
+  position: "absolute",
+  width: "1px",
+  height: "1px",
+  padding: "0",
+  margin: "-1px",
+  overflow: "hidden",
+  clip: "rect(0,0,0,0)",
+  whiteSpace: "nowrap",
+  border: "0",
 };
 
 export function ZodErrorViewer({
   data,
   error,
+  theme = defaultTheme,
 }: {
   /**
    * The data that was parsed when the error occurred
@@ -27,10 +58,28 @@ export function ZodErrorViewer({
    * The zod error that was thrown when parsing the data
    */
   error: z.ZodError;
+
+  theme?: Partial<typeof defaultTheme>;
 }) {
+  const mergedTheme = {
+    ...defaultTheme,
+    ...theme,
+  };
+
   return (
-    <div style={{ fontSize: "1rem", whiteSpace: "nowrapc" }}>
-      <RecursiveViewer data={data} error={error} path={[]} />
+    <div
+      style={{
+        fontSize: "1rem",
+        whiteSpace: "nowrap",
+        background: mergedTheme.background,
+      }}
+    >
+      <RecursiveViewer
+        data={data}
+        error={error}
+        path={[]}
+        theme={mergedTheme}
+      />
     </div>
   );
 }
@@ -43,6 +92,7 @@ function RecursiveViewer({
   indentation = 0,
   lineNum = 1,
   path,
+  theme,
 }: {
   propertyKey?: string;
   data: unknown;
@@ -51,6 +101,7 @@ function RecursiveViewer({
   indentation?: number;
   lineNum?: number;
   path: Array<string | number>;
+  theme: typeof defaultTheme;
 }) {
   const [unionErrorIndex, setSelectedUnionErrorIndex] = useState(0);
 
@@ -72,6 +123,7 @@ function RecursiveViewer({
         error={error}
         onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
         unionErrorIndex={unionErrorIndex}
+        theme={theme}
       />
     );
   }
@@ -89,6 +141,7 @@ function RecursiveViewer({
           error={error}
           onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
           unionErrorIndex={unionErrorIndex}
+          theme={theme}
         />
         {data.map((value, i) => {
           runningLineNum += i === 0 ? 1 : countLines(data[i - 1]);
@@ -101,6 +154,7 @@ function RecursiveViewer({
               indentation={indentation + 1}
               lineNum={runningLineNum}
               path={[...path, i]}
+              theme={theme}
             />
           );
         })}
@@ -112,6 +166,7 @@ function RecursiveViewer({
             runningLineNum +
             (data.length === 0 ? 1 : countLines(data[data.length - 1]))
           }
+          theme={theme}
         />
       </>
     );
@@ -129,6 +184,7 @@ function RecursiveViewer({
         error={error}
         onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
         unionErrorIndex={unionErrorIndex}
+        theme={theme}
       />
       {entries.map(([key, value], i) => {
         runningLineNum += i === 0 ? 1 : countLines(entries[i - 1]?.[1]);
@@ -142,6 +198,7 @@ function RecursiveViewer({
             indentation={indentation + 1}
             lineNum={runningLineNum}
             path={[...path, key]}
+            theme={theme}
           />
         );
       })}
@@ -157,6 +214,7 @@ function RecursiveViewer({
         comma={comma}
         path={path}
         error={getMissingKeysError(error, path)}
+        theme={theme}
       />
     </>
   );
@@ -226,6 +284,7 @@ function Line({
   path,
   unionErrorIndex = 0,
   onSelectUnionErrorIndex,
+  theme,
 }: {
   num: number;
   value?: unknown;
@@ -237,6 +296,7 @@ function Line({
   path?: Array<string | number>;
   unionErrorIndex?: number;
   onSelectUnionErrorIndex?: (err: number) => void;
+  theme: typeof defaultTheme;
 }) {
   const issues =
     error?.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
@@ -251,8 +311,7 @@ function Line({
   return (
     <div
       style={{
-        backgroundColor:
-          issues.length > 0 ? theme.errorBackgroundColor : undefined,
+        backgroundColor: issues.length > 0 ? theme.errorBackground : undefined,
       }}
     >
       <div
@@ -265,6 +324,7 @@ function Line({
           textAlign: "right",
           fontFamily: "monospace",
           userSelect: "none",
+          color: theme.lineNumber,
         }}
       >
         {num}
@@ -284,33 +344,33 @@ function Line({
 
         {/* KEY */}
         {!!propertyKey && (
-          <span style={{ color: theme.keyColor }}>{`"${propertyKey}"`}</span>
+          <span style={{ color: theme.key }}>{`"${propertyKey}"`}</span>
         )}
-        {!!propertyKey && <span>: </span>}
+        {!!propertyKey && <span style={{ color: theme.colon }}>: </span>}
 
         {/* VALUE */}
         {typeof value === "string" && (
-          <span style={{ color: theme.stringColor }}>{`"${value}"`}</span>
+          <span style={{ color: theme.string }}>{`"${value}"`}</span>
         )}
         {typeof value === "number" && (
-          <span style={{ color: theme.numColor }}>{value}</span>
+          <span style={{ color: theme.number }}>{value}</span>
         )}
         {typeof value === "boolean" && value && (
-          <span style={{ color: theme.booleanColor }}>true</span>
+          <span style={{ color: theme.boolean }}>true</span>
         )}
         {typeof value === "boolean" && !value && (
-          <span style={{ color: theme.booleanColor }}>false</span>
+          <span style={{ color: theme.boolean }}>false</span>
         )}
-        {value === null && <span style={{ color: theme.nullColor }}>null</span>}
+        {value === null && <span style={{ color: theme.null }}>null</span>}
 
         {/* BRACKET */}
-        {bracket}
+        {bracket && <span style={{ color: theme.bracket }}>{bracket}</span>}
 
         {/* COMMA */}
-        {comma && <span>,</span>}
+        {comma && <span style={{ color: theme.comma }}>,</span>}
 
         {issue && (
-          <span style={{ color: theme.errorForegroundColor }}>
+          <span style={{ color: theme.errorForeground }}>
             <ErrorIcon />
             <span style={srOnly}> // Error: </span>
             <span>
@@ -324,7 +384,7 @@ function Line({
                   <ErrorSwitcher
                     index={unionErrorIndex}
                     max={issue.unionErrors.length}
-                    // TODO: Remove null assertions
+                    theme={theme}
                     onPrev={() =>
                       onSelectUnionErrorIndex?.(unionErrorIndex - 1)
                     }
@@ -353,11 +413,13 @@ function ErrorSwitcher({
   max,
   onPrev,
   onNext,
+  theme,
 }: {
   index: number;
   max: number;
   onPrev: () => void;
   onNext: () => void;
+  theme: typeof defaultTheme;
 }) {
   return (
     <>
@@ -365,10 +427,10 @@ function ErrorSwitcher({
       <div
         style={{
           display: "inline-block",
-          border: `1px solid ${theme.errorForegroundColor}`,
+          border: `1px solid ${theme.errorForeground}`,
           borderRadius: "4px",
           fontSize: "0.85rem",
-          backgroundColor: "white",
+          backgroundColor: theme.background,
         }}
       >
         <span
@@ -380,8 +442,8 @@ function ErrorSwitcher({
           type="button"
           onClick={onPrev}
           style={{
-            ...buttonStyle,
-            borderRight: "1px solid white",
+            ...buttonStyle(theme),
+            borderRight: `1px solid ${theme.background}`,
           }}
           aria-label="Previous union error"
         >
@@ -390,7 +452,7 @@ function ErrorSwitcher({
         <button
           type="button"
           onClick={onNext}
-          style={buttonStyle}
+          style={buttonStyle(theme)}
           aria-label="Next union error"
         >
           <ChevronRightIcon />
@@ -400,31 +462,6 @@ function ErrorSwitcher({
     </>
   );
 }
-
-const buttonStyle: CSSProperties = {
-  appearance: "none",
-  backgroundColor: theme.errorForegroundColor,
-  color: "white",
-  border: "none",
-  fontSize: "0.75rem",
-  cursor: "pointer",
-  padding: "2px",
-  paddingLeft: "6px",
-  paddingRight: "6px",
-  userSelect: "none",
-};
-
-const srOnly: CSSProperties = {
-  position: "absolute",
-  width: "1px",
-  height: "1px",
-  padding: "0",
-  margin: "-1px",
-  overflow: "hidden",
-  clip: "rect(0,0,0,0)",
-  whiteSpace: "nowrap",
-  border: "0",
-};
 
 function ChevronLeftIcon() {
   return (
