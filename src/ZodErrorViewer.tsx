@@ -19,11 +19,17 @@ export function ZodErrorViewer({
   data,
   error,
 }: {
+  /**
+   * The data that was parsed when the error occurred
+   */
   data: unknown;
+  /**
+   * The zod error that was thrown when parsing the data
+   */
   error: z.ZodError;
 }) {
   return (
-    <div style={{ fontSize: "1rem" }}>
+    <div style={{ fontSize: "1rem", whiteSpace: "nowrapc" }}>
       <RecursiveViewer data={data} error={error} path={[]} />
     </div>
   );
@@ -247,7 +253,7 @@ function Line({
         {issue && (
           <span style={{ color: theme.errorForegroundColor }}>
             <ErrorIcon />
-            <span style={srOnly}>&nbsp;//&nbsp;Error:&nbsp;</span>
+            <span style={srOnly}> // Error: </span>
             <span>
               {issue.code === ZodIssueCode.invalid_union
                 ? "Invalid union entry"
@@ -326,7 +332,7 @@ function ErrorSwitcher({
           type="button"
           onClick={onNext}
           style={buttonStyle}
-          aria-label="Nexr union error"
+          aria-label="Next union error"
         >
           <ChevronRightIcon />
         </button>

@@ -27,7 +27,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 // More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-export const Primary: Story = {
+export const Basic: Story = {
   args: {
     data: {
       person: {
@@ -49,6 +49,33 @@ export const Primary: Story = {
           name: "Han Solo",
           age: "35",
           shotFirst: false,
+        },
+      }).error!,
+  },
+};
+
+export const Unions: Story = {
+  args: {
+    data: {
+      person: {
+        name: "Han Solo",
+        age: "35",
+      },
+    },
+    error: z
+      .union([
+        z.string(),
+        z.object({
+          person: z.object({
+            name: z.string(),
+            age: z.number(),
+          }),
+        }),
+      ])
+      .safeParse({
+        person: {
+          name: "Han Solo",
+          age: "35",
         },
       }).error!,
   },
