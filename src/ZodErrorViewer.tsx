@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useState, useMemo } from "react";
 import { z, ZodError, ZodIssueCode } from "zod";
 
 const defaultTheme = {
@@ -71,6 +71,8 @@ export function ZodErrorViewer({
     ...theme,
   };
 
+  const countLines = useMemo(() => createMemoizedCountLines(), [data]);
+
   return (
     <div
       style={{
@@ -84,6 +86,7 @@ export function ZodErrorViewer({
         error={error}
         path={[]}
         theme={mergedTheme}
+        countLines={countLines}
       />
     </div>
   );
@@ -98,6 +101,7 @@ function RecursiveViewer({
   lineNum = 1,
   path,
   theme,
+  countLines,
 }: {
   propertyKey?: string;
   data: unknown;
@@ -107,6 +111,7 @@ function RecursiveViewer({
   lineNum?: number;
   path: Array<string | number>;
   theme: typeof defaultTheme;
+  countLines: (data: unknown) => number;
 }) {
   const [unionErrorIndex, setSelectedUnionErrorIndex] = useState(0);
 
@@ -160,6 +165,7 @@ function RecursiveViewer({
               lineNum={runningLineNum}
               path={[...path, i]}
               theme={theme}
+              countLines={countLines}
             />
           );
         })}
@@ -204,6 +210,7 @@ function RecursiveViewer({
             lineNum={runningLineNum}
             path={[...path, key]}
             theme={theme}
+            countLines={countLines}
           />
         );
       })}
@@ -531,18 +538,35 @@ function ErrorIcon() {
   );
 }
 
-// TODO: make this use memoization?
-function countLines(data: unknown): number {
-  if (typeof data !== "object" || data === null) {
-    return 1;
+function createMemoizedCountLines() {
+  const cache = new Map<unknown, number>();
+
+  function countLines(data: unknown): number {
+    if (cache.has(data)) {
+      return cache.get(data)!;
+    }
+
+    if (typeof data !== "object" || data === null) {
+      const result = 1;
+      cache.set(data, result);
+      return result;
+    }
+
+    if (Array.isArray(data)) {
+      const result = 2 + data.reduce((acc, curr) => acc + countLines(curr), 0);
+      cache.set(data, result);
+      return result;
+    }
+
+    const result =
+      2 +
+      Object.entries(data).reduce(
+        (acc, [, value]) => acc + countLines(value),
+        0,
+      );
+    cache.set(data, result);
+    return result;
   }
 
-  if (Array.isArray(data)) {
-    return 2 + data.reduce((acc, curr) => acc + countLines(curr), 0);
-  }
-
-  return (
-    2 +
-    Object.entries(data).reduce((acc, [, value]) => acc + countLines(value), 0)
-  );
+  return countLines;
 }
