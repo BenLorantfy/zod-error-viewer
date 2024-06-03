@@ -71,7 +71,7 @@ export function ZodErrorViewer({
     ...theme,
   };
 
-  const countLines = useMemo(() => createMemoizedCountLines(), [data]);
+  const countLines = useMemo(() => createMemoizedCountLines(data), [data]);
 
   return (
     <div
@@ -538,7 +538,7 @@ function ErrorIcon() {
   );
 }
 
-function createMemoizedCountLines() {
+function createMemoizedCountLines(data: unknown) {
   const cache = new Map<unknown, number>();
 
   function countLines(data: unknown): number {
@@ -567,6 +567,8 @@ function createMemoizedCountLines() {
     cache.set(data, result);
     return result;
   }
+
+  countLines(data);
 
   return countLines;
 }
