@@ -1,0 +1,10 @@
+{
+  "extends": ["./tsconfig.json"],
+  "compilerOptions": {
+    "outDir": "./dist/cjs",
+    "noEmit": false,
+    "module": "CommonJS",
+    "moduleResolution": "node10"
+  },
+  "exclude": ["**/*.stories.tsx", "**/*.test.tsx"]
+}

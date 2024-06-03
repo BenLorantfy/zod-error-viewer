@@ -12,3 +12,11 @@ jobs:
       - run: pnpm test
       - run: pnpm lint
       - run: pnpm format:check
+      - run: pnpm build
+      - run: |
+          if [ $GITHUB_REF = "refs/heads/main" ]; then
+            echo "Branch is main, publishing package."
+            # pnpm publish --access public
+          else
+            echo "Branch is not main, skipping publish step."
+          fi

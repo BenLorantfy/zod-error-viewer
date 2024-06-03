@@ -1,6 +1,6 @@
 "use client";
 
-import { CSSProperties, useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { z, ZodError, ZodIssueCode } from "zod";
 
 const defaultTheme = {
