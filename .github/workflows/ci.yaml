@@ -17,20 +17,25 @@ jobs:
       - run: pnpm build
       - run: |
           if [ $GITHUB_REF != "refs/heads/main" ]; then
-            echo "Branch is not main, skipping publish step."
+            echo "Branch is not main, skipping publish step"
             exit 0
           fi
 
-          echo "Branch is main"
+          echo "Branch is main, proceeding..."
 
           prev_version=$(git show HEAD~1:package.json | jq -r '.version')
           new_version=$(cat package.json | jq -r '.version')
 
           if [ $prev_version = $new_version ]; then
-            echo "Version has not changed, skipping publish step."
+            echo "Version has not changed, skipping publish step"
             exit 0
           fi
 
-          echo "Version was changed from ${prev_version} to ${new_version}, proceeding with publish step."
+          echo "Version was changed from ${prev_version} to ${new_version}, proceeding with publish step..."
 
-          NPM_TOKEN="${{ secrets.NPM_TOKEN }}" pnpm publish
+          echo "Setting auth token..."
+          pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
+          echo "Set auth token"
+
+          echo "Publishing package..."
+          pnpm publish
