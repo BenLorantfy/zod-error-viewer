@@ -20,13 +20,13 @@ Zod is an amazing library. However, hairy zod errors can take a while to underst
 
 ## Getting Started
 
-## Installing
+### Installing
 
 ```
 npm install zod-error-viewer
 ```
 
-## Basic Example
+### Basic Example
 
 ```tsx
 import { ZodErrorViewer } from "zod-error-viewer";
@@ -37,6 +37,6 @@ import { ZodErrorViewer } from "zod-error-viewer";
 />;
 ```
 
-## Documentation
+### Documentation
 
 For more examples and documentation, see:
