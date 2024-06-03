@@ -225,43 +225,10 @@ function RecursiveViewer({
         indentation={indentation}
         comma={comma}
         path={path}
-        error={getMissingKeysError(error, path)}
         theme={theme}
       />
     </>
   );
-}
-
-/**
- * Constructs a custom error that mentions which keys are missing in an object
- */
-function getMissingKeysError(error: ZodError, objPath: Array<string | number>) {
-  const missingKeyIssues = error.issues.filter((issue) => {
-    return (
-      issue.code === ZodIssueCode.invalid_type &&
-      issue.received === "undefined" &&
-      issue.message === "Required" &&
-      issue.path.slice(0, issue.path.length - 1).join(".") === objPath.join(".")
-    );
-  });
-
-  if (missingKeyIssues.length > 0) {
-    const keys = missingKeyIssues.map(
-      (issue) => issue.path[issue.path.length - 1],
-    );
-    return new ZodError([
-      {
-        code: ZodIssueCode.custom,
-        path: objPath,
-        message:
-          keys.length === 1
-            ? `Object missing required key: ${keys[0]}`
-            : `Object missing required keys: ${keys.map((key) => `'${key}'`).join(", ")}`,
-      },
-    ]);
-  }
-
-  return undefined;
 }
 
 /**
@@ -272,17 +239,47 @@ function getUnionError({
   path,
   index,
 }: {
-  error?: ZodError;
-  path?: Array<string | number>;
+  error: ZodError;
+  path: Array<string | number>;
   index: number;
 }) {
-  const issues =
-    error?.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
+  const unionIssue = error.issues.find(
+    (issue): issue is Extract<typeof issue, { code: "invalid_union" }> =>
+      issue.code === ZodIssueCode.invalid_union &&
+      issue.path.join(".") === path.join("."),
+  );
+  return unionIssue ? unionIssue.unionErrors[index] : undefined;
+}
+
+function getRelevantIssues(error: ZodError, path: Array<string | number>) {
+  const relevantIssues =
+    error.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
     [];
-  const issue = issues[0];
-  return issue?.code === ZodIssueCode.invalid_union
-    ? issue?.unionErrors[index]
-    : undefined;
+
+  const missingKeys = [];
+  for (const issue of error.issues) {
+    if (
+      issue.code === ZodIssueCode.invalid_type &&
+      issue.received === "undefined" &&
+      issue.message === "Required" &&
+      issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+    ) {
+      missingKeys.push(issue.path[issue.path.length - 1]);
+    }
+  }
+
+  if (missingKeys.length > 0) {
+    relevantIssues.push({
+      code: ZodIssueCode.custom,
+      path,
+      message:
+        missingKeys.length === 1
+          ? `Object missing required key: '${missingKeys[0]}'`
+          : `Object missing required keys: ${missingKeys.map((key) => `'${key}'`).join(", ")}`,
+    });
+  }
+
+  return relevantIssues;
 }
 
 function Line({
@@ -310,15 +307,16 @@ function Line({
   onSelectUnionErrorIndex?: (err: number) => void;
   theme: typeof defaultTheme;
 }) {
-  const issues =
-    error?.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
-    [];
+  const issues = error ? getRelevantIssues(error, path || []) : [];
   const issue = issues[0];
-  const unionError = getUnionError({
-    error,
-    path,
-    index: unionErrorIndex,
-  });
+  const unionError =
+    error &&
+    path &&
+    getUnionError({
+      error,
+      path,
+      index: unionErrorIndex,
+    });
 
   return (
     <div
@@ -405,11 +403,9 @@ function Line({
                     }
                   />
                   {`: `}
-                  {
-                    unionError?.issues.find(
-                      (issue) => issue.path.join(".") === path?.join("."),
-                    )?.message
-                  }
+                  {unionError
+                    ? getRelevantIssues(unionError, path)[0]?.message
+                    : undefined}
                 </>
               )}
             </span>

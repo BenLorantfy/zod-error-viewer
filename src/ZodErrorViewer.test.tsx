@@ -6,6 +6,7 @@ import { composeStories } from "@storybook/react";
 import { render, screen, cleanup, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { z } from "zod";
+import { ZodErrorViewer } from "./ZodErrorViewer";
 
 const {
   Basic,
@@ -138,6 +139,28 @@ test("renders correctly for unions when no entry has a root level error", async 
   `);
 });
 
+test("renders correctly for unions where one entry is missing keys", async () => {
+  const data = {
+    name: "Han Solo",
+  };
+
+  const error = z
+    .union([
+      z.object({ name: z.string(), age: z.number(), height: z.number() }),
+      z.string(),
+    ])
+    .safeParse(data).error!;
+
+  render(<ZodErrorViewer data={data} error={error} />);
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{ // Error: Invalid union entry 1/2 : Object missing required keys: 'age', 'height'
+    2	"name": "Han Solo"
+    3}
+    "
+  `);
+});
+
 test("renders correctly for nested unions", async () => {
   render(<NestedUnions />);
   expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
@@ -148,7 +171,7 @@ test("renders correctly for nested unions", async () => {
     4		"age": 35,
     5		"sideKicks": [
     6			{
-    7				"name": "R2-D2"
+    7				"name": "Zeb Orrelios"
     8			}
     9		]
     10	}
@@ -166,7 +189,7 @@ test("renders correctly for nested unions", async () => {
     4		"age": 35,
     5		"sideKicks": [
     6			{ // Error: Invalid union entry 1/2 : 
-    7				"name": "R2-D2" // Error: Invalid literal value, expected "Chewbacca"
+    7				"name": "Zeb Orrelios" // Error: Invalid literal value, expected "Chewbacca"
     8			}
     9		]
     10	}
@@ -187,7 +210,7 @@ test("renders correctly for nested unions", async () => {
     4		"age": 35,
     5		"sideKicks": [
     6			{ // Error: Invalid union entry 2/2 : 
-    7				"name": "R2-D2" // Error: Invalid literal value, expected "Lando Calrissian"
+    7				"name": "Zeb Orrelios" // Error: Invalid literal value, expected "Lando Calrissian"
     8			}
     9		]
     10	}
@@ -202,9 +225,9 @@ test("renders correctly for missing keys", () => {
   expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
     "
     1{
-    2	"person": {
+    2	"person": { // Error: Object missing required keys: 'height', 'age'
     3		"name": "Han Solo"
-    4	} // Error: Object missing required keys: 'height', 'age'
+    4	}
     5}
     "
   `);

@@ -84,7 +84,7 @@ const nestedUnionsData = {
     age: 35,
     sideKicks: [
       {
-        name: "R2-D2",
+        name: "Zeb Orrelios",
       },
     ],
   },
