@@ -8,6 +8,8 @@ jobs:
         with:
           version: 8
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
       - run: pnpm install
       - run: pnpm test
       - run: pnpm lint
@@ -15,7 +17,7 @@ jobs:
       - run: pnpm build
       - run: |
           if [ $GITHUB_REF != "refs/heads/main" ]; then
-            echo "Branch is not main, skipping release step."
+            echo "Branch is not main, skipping publish step."
             exit 0
           fi
 
