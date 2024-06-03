@@ -55,6 +55,12 @@ const unionsData = {
     age: "35",
   },
 };
+
+/**
+ * An example showing how union errors are displayed.  Each union entry will
+ * have its own error.  The user can switch between union entry errors by using
+ * prev / next buttons.
+ */
 export const Unions: Story = {
   args: {
     data: unionsData,
@@ -83,6 +89,11 @@ const nestedUnionsData = {
     ],
   },
 };
+
+/**
+ * A more complicated example showing nested unions and multiple prev / next
+ * buttons
+ */
 export const NestedUnions: Story = {
   args: {
     data: nestedUnionsData,
@@ -115,6 +126,10 @@ const missingKeysData = {
     name: "Han Solo",
   },
 };
+
+/**
+ * An example showing how missing keys are displayed
+ */
 export const MissingKeys: Story = {
   args: {
     data: missingKeysData,
@@ -136,6 +151,10 @@ const unrecongizedKeysData = {
     age: 45,
   },
 };
+
+/**
+ * An example showing how unrecognized keys are displayed
+ */
 export const UnreconginzedKeys: Story = {
   args: {
     data: unrecongizedKeysData,
@@ -152,6 +171,9 @@ const invalidEnumValue = {
   },
 };
 
+/**
+ * An example showing how invalid enum values are displayed
+ */
 export const InvalidEnumValue: Story = {
   args: {
     data: invalidEnumValue,
@@ -172,6 +194,10 @@ const invalidDateValue = {
     birthDate: "2024-70-70",
   },
 };
+
+/**
+ * An example showing how invalid date values are displayed
+ */
 export const InvalidDateValue: Story = {
   args: {
     data: invalidDateValue,
@@ -193,6 +219,10 @@ const invalidStringValue = {
     website: "http://",
   },
 };
+
+/**
+ * An example showing how invalid string values are displayed
+ */
 export const InvalidStringValue: Story = {
   args: {
     data: invalidStringValue,
@@ -213,6 +243,9 @@ const sizeErrorsData = {
   arr2: [],
 };
 
+/**
+ * An example showing how size errors are displayed
+ */
 export const SizeErrors: Story = {
   args: {
     data: sizeErrorsData,
@@ -228,6 +261,10 @@ export const SizeErrors: Story = {
 const notMultipleOfErr = {
   num: 7,
 };
+
+/**
+ * An example showing how not multiple of errors are displayed
+ */
 export const NotMultipleOfError: Story = {
   args: {
     data: notMultipleOfErr,
@@ -244,6 +281,9 @@ const customError = {
   },
 };
 
+/**
+ * An example showing how custom errors are displayed
+ */
 export const CustomError: Story = {
   args: {
     data: customError,
@@ -276,6 +316,10 @@ const customThemeData = {
     myArr: ["aaa", 42, true, null],
   },
 };
+
+/**
+ * An example showing how you can pass a custom theme to the component
+ */
 export const CustomTheme: Story = {
   args: {
     data: customThemeData,

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="img/zod-error-viewer.png" width="200px" align="center" alt="" />
+  <img src="img/logo.png" width="200px" align="center" alt="" />
   <h1 align="center">zod-error-viewer</h1>
 <p align="center">
 <a href="https://github.com/benlorantfy/zod-error-viewer/actions?query=branch%3Amain"><img src="https://github.com/BenLorantfy/zod-error-viewer/actions/workflows/ci.yaml/badge.svg?event=push&branch=main" alt="zod-error-viewer CI status" /></a>
@@ -39,4 +39,4 @@ import { ZodErrorViewer } from "zod-error-viewer";
 
 ### Documentation
 
-For more examples and documentation, see:
+For more examples and documentation, see: https://benlorantfy.github.io/zod-error-viewer

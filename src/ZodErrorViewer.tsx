@@ -45,6 +45,9 @@ const srOnly: CSSProperties = {
   border: "0",
 };
 
+/**
+ * Renders a component that displays a Zod error and the parsed data that caused the error.
+ */
 export function ZodErrorViewer({
   data,
   error,
@@ -58,7 +61,9 @@ export function ZodErrorViewer({
    * The zod error that was thrown when parsing the data
    */
   error: z.ZodError;
-
+  /**
+   * A custom theme to apply to the component
+   */
   theme?: Partial<typeof defaultTheme>;
 }) {
   const mergedTheme = {
