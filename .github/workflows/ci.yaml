@@ -40,7 +40,7 @@ jobs:
 
           echo "Publishing package..."
           pnpm publish
-      - name: Build documentation:
+      - name: Build documentation
         run: pnpm build-storybook
       - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v3
