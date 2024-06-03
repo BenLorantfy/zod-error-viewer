@@ -538,7 +538,7 @@ function ErrorIcon() {
   );
 }
 
-function createMemoizedCountLines(data: unknown) {
+function createMemoizedCountLines(rootData: unknown) {
   const cache = new Map<unknown, number>();
 
   function countLines(data: unknown): number {
@@ -568,7 +568,7 @@ function createMemoizedCountLines(data: unknown) {
     return result;
   }
 
-  countLines(data);
+  countLines(rootData);
 
   return countLines;
 }
