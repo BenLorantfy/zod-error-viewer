@@ -130,6 +130,7 @@ const missingKeysData = {
 /**
  * An example showing how missing keys are displayed
  */
+// TODO: add test for missing key that is a union
 export const MissingKeys: Story = {
   args: {
     data: missingKeysData,
@@ -140,6 +141,7 @@ export const MissingKeys: Story = {
           height: z.number(),
           age: z.number(),
           sideKick: z.literal("Chewbacca"),
+          hairColor: z.union([z.literal("brown"), z.literal("black")]),
         }),
       })
       .safeParse(missingKeysData).error!,

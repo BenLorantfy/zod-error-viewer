@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties, useState, useMemo } from "react";
-import { z, ZodError, ZodIssueCode } from "zod";
+import { z, ZodError, ZodIssue, ZodIssueCode } from "zod";
 
 const defaultTheme = {
   lineNumber: "black",
@@ -258,17 +258,13 @@ function getRelevantIssues(error: ZodError, path: Array<string | number>) {
 
   const missingKeys = [];
   for (const issue of error.issues) {
-    if (
-      issue.code === ZodIssueCode.invalid_type &&
-      issue.received === "undefined" &&
-      issue.message === "Required" &&
-      issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
-    ) {
+    if (isMissing(issue, path)) {
       missingKeys.push(issue.path[issue.path.length - 1]);
     } else if (
-      issue.code === ZodIssueCode.invalid_literal &&
-      typeof issue.received === "undefined" &&
-      issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+      issue.code === ZodIssueCode.invalid_union &&
+      issue.unionErrors.every((err) =>
+        err.issues.some((iss) => isMissing(iss, path)),
+      )
     ) {
       missingKeys.push(issue.path[issue.path.length - 1]);
     }
@@ -286,6 +282,26 @@ function getRelevantIssues(error: ZodError, path: Array<string | number>) {
   }
 
   return relevantIssues;
+}
+
+function isMissing(issue: ZodIssue, path: Array<string | number>) {
+  if (
+    issue.code === ZodIssueCode.invalid_type &&
+    issue.received === "undefined" &&
+    issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+  ) {
+    return true;
+  }
+
+  if (
+    issue.code === ZodIssueCode.invalid_literal &&
+    typeof issue.received === "undefined" &&
+    issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 function Line({

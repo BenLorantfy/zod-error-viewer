@@ -1,6 +1,6 @@
 {
   "name": "zod-error-viewer",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "license": "MIT",
   "author": {
     "name": "Ben Lorantfy",
@@ -59,7 +59,6 @@
     "@storybook/addon-essentials": "^8.1.5",
     "@storybook/addon-interactions": "^8.1.5",
     "@storybook/addon-links": "^8.1.5",
-    "@storybook/addon-onboarding": "^8.1.5",
     "@storybook/blocks": "^8.1.5",
     "@storybook/react": "^8.1.5",
     "@storybook/react-vite": "^8.1.5",
