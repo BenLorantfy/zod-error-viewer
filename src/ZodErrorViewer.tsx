@@ -440,20 +440,26 @@ function ErrorSwitcher({
         </span>
         <button
           type="button"
-          onClick={onPrev}
+          onClick={index !== 0 ? onPrev : undefined}
           style={{
             ...buttonStyle(theme),
             borderRight: `1px solid ${theme.background}`,
+            cursor: index === 0 ? "auto" : "pointer",
           }}
           aria-label="Previous union error"
+          aria-disabled={index === 0}
         >
           <ChevronLeftIcon />
         </button>
         <button
           type="button"
-          onClick={onNext}
-          style={buttonStyle(theme)}
+          onClick={index !== max - 1 ? onNext : undefined}
+          style={{
+            ...buttonStyle(theme),
+            cursor: index === max - 1 ? "auto" : "pointer",
+          }}
           aria-label="Next union error"
+          aria-disabled={index === max - 1}
         >
           <ChevronRightIcon />
         </button>

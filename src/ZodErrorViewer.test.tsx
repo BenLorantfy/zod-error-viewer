@@ -106,8 +106,25 @@ test("renders correctly for unions when no entry has a root level error", async 
     "
   `);
 
+  expect(
+    screen
+      .getByRole("button", { name: "Previous union error" })
+      .getAttribute("aria-disabled"),
+  ).toBe("true");
+
+  userEvent.click(screen.getByRole("button", { name: "Previous union error" }));
+  expect(screen.getByText("1/2")).toBeDefined();
+
   userEvent.click(screen.getByRole("button", { name: "Next union error" }));
   await screen.findByText("2/2");
+
+  expect(
+    screen
+      .getByRole("button", { name: "Next union error" })
+      .getAttribute("aria-disabled"),
+  ).toBe("true");
+  userEvent.click(screen.getByRole("button", { name: "Next union error" }));
+  expect(screen.getByText("2/2")).toBeDefined();
 
   expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
     "
