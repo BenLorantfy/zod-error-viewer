@@ -15,7 +15,8 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm build
-      - run: |
+      - name: Publish package
+        run: |
           if [ $GITHUB_REF != "refs/heads/main" ]; then
             echo "Branch is not main, skipping publish step"
             exit 0
