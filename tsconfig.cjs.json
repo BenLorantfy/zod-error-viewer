@@ -4,7 +4,8 @@
     "outDir": "./dist/cjs",
     "noEmit": false,
     "module": "CommonJS",
-    "moduleResolution": "node10"
+    "moduleResolution": "node10",
+    "sourceMap": true
   },
   "exclude": ["**/*.stories.tsx", "**/*.test.tsx"]
 }

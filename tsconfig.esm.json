@@ -6,7 +6,8 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "declaration": true,
-    "declarationDir": "./dist/types"
+    "declarationDir": "./dist/types",
+    "sourceMap": true
   },
   "exclude": ["**/*.stories.tsx", "**/*.test.tsx"]
 }
