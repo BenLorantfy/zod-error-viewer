@@ -265,6 +265,12 @@ function getRelevantIssues(error: ZodError, path: Array<string | number>) {
       issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
     ) {
       missingKeys.push(issue.path[issue.path.length - 1]);
+    } else if (
+      issue.code === ZodIssueCode.invalid_literal &&
+      typeof issue.received === "undefined" &&
+      issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+    ) {
+      missingKeys.push(issue.path[issue.path.length - 1]);
     }
   }
 

@@ -225,7 +225,7 @@ test("renders correctly for missing keys", () => {
   expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
     "
     1{
-    2	"person": { // Error: Object missing required keys: 'height', 'age'
+    2	"person": { // Error: Object missing required keys: 'height', 'age', 'sideKick'
     3		"name": "Han Solo"
     4	}
     5}

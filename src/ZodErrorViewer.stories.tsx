@@ -139,6 +139,7 @@ export const MissingKeys: Story = {
           name: z.string(),
           height: z.number(),
           age: z.number(),
+          sideKick: z.literal("Chewbacca"),
         }),
       })
       .safeParse(missingKeysData).error!,
