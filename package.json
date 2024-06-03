@@ -21,13 +21,13 @@
   "type": "module",
   "module": "dist/esm/ZodErrorViewer.js",
   "main": "dist/cjs/ZodErrorViewer.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/types/ZodErrorViewer.d.ts",
   "sideEffects": false,
   "exports": {
     ".": {
       "import": "./dist/esm/ZodErrorViewer.js",
       "require": "./dist/cjs/ZodErrorViewer.js",
-      "types": "./dist/types/index.d.ts"
+      "types": "./dist/types/ZodErrorViewer.d.ts"
     }
   },
   "scripts": {
