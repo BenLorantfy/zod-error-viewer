@@ -1,6 +1,23 @@
 {
   "name": "zod-error-viewer",
   "version": "0.0.1",
+  "license": "MIT",
+  "author": {
+    "name": "Ben Lorantfy",
+    "url": "https://www.benlorantfy.com/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BenLorantfy/zod-error-viewer"
+  },
+  "keywords": [
+    "zod",
+    "visualization",
+    "viewer"
+  ],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "module": "dist/esm/ZodErrorViewer.js",
   "main": "dist/cjs/ZodErrorViewer.js",
