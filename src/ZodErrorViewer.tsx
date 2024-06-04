@@ -1,6 +1,7 @@
 "use client";
 
-import { type CSSProperties, useState, useMemo } from "react";
+import { type CSSProperties, useState, useMemo, useRef } from "react";
+import { flushSync } from "react-dom";
 import { z, ZodError, ZodIssue, ZodIssueCode } from "zod";
 
 const defaultTheme = {
@@ -18,6 +19,8 @@ const defaultTheme = {
   bracket: "#1330f0",
   colon: "#22509f",
   comma: "black",
+  truncation: "#616161",
+  truncationBackground: "#edf2ff",
 };
 
 const buttonStyle = (theme: typeof defaultTheme): CSSProperties => ({
@@ -102,6 +105,9 @@ function RecursiveViewer({
   path,
   theme,
   countLines,
+  onToggleTruncate,
+  toggleButtonRef,
+  truncated,
 }: {
   propertyKey?: string;
   data: unknown;
@@ -112,8 +118,16 @@ function RecursiveViewer({
   path: Array<string | number>;
   theme: typeof defaultTheme;
   countLines: (data: unknown) => number;
+  onToggleTruncate?: () => void;
+  toggleButtonRef?: React.RefObject<HTMLButtonElement>;
+  truncated?: boolean;
 }) {
   const [unionErrorIndex, setSelectedUnionErrorIndex] = useState(0);
+  const [truncateStart, setTruncateStart] = useState(true);
+  const [truncateEnd, setTruncateEnd] = useState(true);
+
+  const startToggleButtonRef = useRef<HTMLButtonElement>(null);
+  const endToggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const unionError = getUnionError({
     error,
@@ -134,16 +148,44 @@ function RecursiveViewer({
         onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
         unionErrorIndex={unionErrorIndex}
         theme={theme}
+        onToggleTruncate={onToggleTruncate}
+        toggleButtonRef={toggleButtonRef}
+        truncated={truncated}
       />
     );
   }
 
   let runningLineNum = lineNum;
   if (Array.isArray(data)) {
+    const firstInvalidItemIndex = data.findIndex((_, idx) => {
+      const itemPath = [...path, idx];
+      return error.issues.some(
+        (issue) =>
+          issue.path.slice(0, itemPath.length).join(".") === itemPath.join("."),
+      );
+    });
+
+    const lastInvalidItemIndex = findLastIndex(data, (_, idx) => {
+      const itemPath = [...path, idx];
+      return error.issues.some(
+        (issue) =>
+          issue.path.slice(0, itemPath.length).join(".") === itemPath.join("."),
+      );
+    });
+
+    const firstPart =
+      firstInvalidItemIndex !== -1 ? data.slice(0, firstInvalidItemIndex) : [];
+    const secondPart =
+      firstInvalidItemIndex !== -1 && lastInvalidItemIndex !== -1
+        ? data.slice(firstInvalidItemIndex, lastInvalidItemIndex + 1)
+        : data;
+    const thirdPart =
+      lastInvalidItemIndex !== -1 ? data.slice(lastInvalidItemIndex + 1) : [];
+
     return (
       <>
         <Line
-          num={lineNum}
+          num={runningLineNum++}
           propertyKey={propertyKey}
           bracket="["
           indentation={indentation}
@@ -152,9 +194,61 @@ function RecursiveViewer({
           onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
           unionErrorIndex={unionErrorIndex}
           theme={theme}
+          onToggleTruncate={onToggleTruncate}
+          toggleButtonRef={toggleButtonRef}
+          truncated={truncated}
         />
-        {data.map((value, i) => {
-          runningLineNum += i === 0 ? 1 : countLines(data[i - 1]);
+        {firstPart.length > 5 && truncateStart ? (
+          <Line
+            num={(() => {
+              const num = runningLineNum;
+              runningLineNum += countLines(firstPart) - 2;
+              return num;
+            })()}
+            onToggleTruncate={() => {
+              flushSync(() => {
+                setTruncateStart(!truncateStart);
+              });
+              startToggleButtonRef.current?.focus();
+            }}
+            toggleButtonRef={startToggleButtonRef}
+            indentation={indentation + 1}
+            theme={theme}
+            truncated
+          />
+        ) : (
+          firstPart.map((value, i) => {
+            const numLines = countLines(firstPart[i]);
+            runningLineNum += numLines;
+            return (
+              <RecursiveViewer
+                key={i}
+                data={value}
+                error={unionError || error}
+                comma={i !== data.length - 1}
+                indentation={indentation + 1}
+                lineNum={runningLineNum - numLines}
+                path={[...path, i]}
+                theme={theme}
+                countLines={countLines}
+                onToggleTruncate={
+                  i === 0 && firstPart.length > 5
+                    ? () => {
+                        flushSync(() => {
+                          setTruncateStart(!truncateStart);
+                        });
+                        startToggleButtonRef.current?.focus();
+                      }
+                    : undefined
+                }
+                toggleButtonRef={startToggleButtonRef}
+              />
+            );
+          })
+        )}
+        {secondPart.map((value, i) => {
+          const numLines = countLines(secondPart[i]);
+          runningLineNum += numLines;
           return (
             <RecursiveViewer
               key={i}
@@ -162,21 +256,66 @@ function RecursiveViewer({
               error={unionError || error}
               comma={i !== data.length - 1}
               indentation={indentation + 1}
-              lineNum={runningLineNum}
-              path={[...path, i]}
+              lineNum={runningLineNum - numLines}
+              path={[...path, i + firstPart.length]}
               theme={theme}
               countLines={countLines}
             />
           );
         })}
+        {thirdPart.length > 5 && truncateEnd ? (
+          <Line
+            num={(() => {
+              const num = runningLineNum;
+              runningLineNum += countLines(thirdPart) - 2;
+              return num;
+            })()}
+            onToggleTruncate={() => {
+              flushSync(() => {
+                setTruncateEnd(!truncateEnd);
+              });
+              endToggleButtonRef.current?.focus();
+            }}
+            toggleButtonRef={endToggleButtonRef}
+            truncated
+            indentation={indentation + 1}
+            theme={theme}
+          />
+        ) : (
+          thirdPart.map((value, i) => {
+            const numLines = countLines(thirdPart[i]);
+            runningLineNum += numLines;
+            return (
+              <RecursiveViewer
+                key={i}
+                data={value}
+                error={unionError || error}
+                comma={i !== thirdPart.length - 1}
+                indentation={indentation + 1}
+                lineNum={runningLineNum - numLines}
+                path={[...path, i + firstPart.length + secondPart.length]}
+                theme={theme}
+                countLines={countLines}
+                onToggleTruncate={
+                  i === 0 && thirdPart.length > 5
+                    ? () => {
+                        flushSync(() => {
+                          setTruncateEnd(!truncateEnd);
+                        });
+                        endToggleButtonRef.current?.focus();
+                      }
+                    : undefined
+                }
+                toggleButtonRef={endToggleButtonRef}
+              />
+            );
+          })
+        )}
         <Line
           bracket="]"
           indentation={indentation}
           comma={comma}
-          num={
-            runningLineNum +
-            (data.length === 0 ? 1 : countLines(data[data.length - 1]))
-          }
+          num={runningLineNum++}
           theme={theme}
         />
       </>
@@ -196,6 +335,9 @@ function RecursiveViewer({
         onSelectUnionErrorIndex={setSelectedUnionErrorIndex}
         unionErrorIndex={unionErrorIndex}
         theme={theme}
+        onToggleTruncate={onToggleTruncate}
+        toggleButtonRef={toggleButtonRef}
+        truncated={truncated}
       />
       {entries.map(([key, value], i) => {
         runningLineNum += i === 0 ? 1 : countLines(entries[i - 1]?.[1]);
@@ -316,6 +458,9 @@ function Line({
   unionErrorIndex = 0,
   onSelectUnionErrorIndex,
   theme,
+  onToggleTruncate,
+  toggleButtonRef,
+  truncated,
 }: {
   num: number;
   value?: unknown;
@@ -328,6 +473,9 @@ function Line({
   unionErrorIndex?: number;
   onSelectUnionErrorIndex?: (err: number) => void;
   theme: typeof defaultTheme;
+  onToggleTruncate?: () => void;
+  toggleButtonRef?: React.RefObject<HTMLButtonElement>;
+  truncated?: boolean;
 }) {
   const issues = error ? getRelevantIssues(error, path || []) : [];
   const issue = issues[0];
@@ -401,10 +549,56 @@ function Line({
         {/* COMMA */}
         {comma && <span style={{ color: theme.comma }}>,</span>}
 
+        {/* TRUNCATION */}
+        {onToggleTruncate && (
+          <button
+            type="button"
+            onClick={onToggleTruncate}
+            ref={toggleButtonRef}
+            aria-label={truncated ? "Expand" : "Collapse"}
+            style={{
+              appearance: "none",
+              background: "none",
+              border: "none",
+              backgroundColor: theme.truncationBackground,
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontFamily: "monospace",
+              letterSpacing: "-0.2rem",
+              color: theme.truncation,
+              overflow: "hidden", // Hide overflow so focus outline is still rectangular
+
+              // Don't allow selecting / copying the ellipsis when truncated.
+              // Ellipsis does not mean anything when pasted
+              userSelect: !truncated ? "none" : undefined,
+            }}
+          >
+            <span
+              style={{ position: "relative", top: "-0.2rem", left: "0.04rem" }}
+            >
+              {/* Only show // when copying / pasting text.  This is so the JSON can still be parsed (if using jsonc) */}
+              <span aria-hidden style={srOnly}>
+                //{" "}
+              </span>
+              ...{" "}
+              {truncated && (
+                // When copying / pasting text, add "truncated" to be more descriptive
+                <span style={srOnly} aria-hidden>
+                  truncated ...
+                </span>
+              )}
+            </span>
+          </button>
+        )}
+
         {issue && (
           <span style={{ color: theme.errorForeground }}>
             <ErrorIcon />
-            <span style={srOnly}> // Error: </span>
+            {/* When copying / pasting text, add "// Error:" To be more descriptive and so JSON can still be parsed (if using jsonc) */}
+            <span style={srOnly}>
+              {" "}
+              <span aria-hidden>//</span> Error:{" "}
+            </span>
             <span>
               {issue.code === ZodIssueCode.invalid_union
                 ? "Invalid union entry"
@@ -589,4 +783,20 @@ function createMemoizedCountLines(rootData: unknown) {
   countLines(rootData);
 
   return countLines;
+}
+
+/**
+ * Polyfill for https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findLastIndex
+ */
+function findLastIndex<T>(
+  arr: T[],
+  predicate: (value: T, idx: number) => boolean,
+) {
+  for (let i = arr.length - 1; i >= 0; i--) {
+    if (predicate(arr[i]!, i)) {
+      return i;
+    }
+  }
+
+  return -1;
 }

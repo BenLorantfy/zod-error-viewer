@@ -310,13 +310,108 @@ export const CustomError: Story = {
   },
 };
 
+const truncatedArrayData = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  0,
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+];
+export const TruncatedArray: Story = {
+  args: {
+    data: truncatedArrayData,
+    error: z.array(z.string()).safeParse(truncatedArrayData).error!,
+  },
+};
+
+const endTruncatedArrayData = [
+  "a",
+  "b",
+  "c",
+  0,
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+];
+export const EndTruncatedArray: Story = {
+  args: {
+    data: endTruncatedArrayData,
+    error: z.array(z.string()).safeParse(endTruncatedArrayData).error!,
+  },
+};
+
+const startTruncatedArrayData = [
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  0,
+  "p",
+  "q",
+  "r",
+];
+export const StartTruncatedArray: Story = {
+  args: {
+    data: startTruncatedArrayData,
+    error: z.array(z.string()).safeParse(startTruncatedArrayData).error!,
+  },
+};
+
+export const NestedTruncatedArray: Story = {
+  args: {
+    data: { arr: truncatedArrayData },
+    error: z
+      .object({ arr: z.string().array() })
+      .safeParse({ arr: truncatedArrayData }).error!,
+  },
+};
+
 const customThemeData = {
   myObject: {
     myStr: "hello",
     myNum: 42,
     myBool: true,
     myNull: null,
-    myArr: ["aaa", 42, true, null],
+    myArr: ["aaa", 42, true, null, 1, 2, 3, 4, 5, 6, 7, 8],
   },
 };
 
@@ -352,6 +447,8 @@ export const CustomTheme: Story = {
       comma: "#d4d4d4",
       lineNumberBackground: "#141414",
       lineNumber: "#848484",
+      truncationBackground: "#4b4b4b",
+      truncation: "#d3d3d3",
     },
   },
 };

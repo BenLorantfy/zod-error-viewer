@@ -3,7 +3,13 @@
 import { test, expect, beforeEach } from "vitest";
 import Meta, * as stories from "./ZodErrorViewer.stories";
 import { composeStories } from "@storybook/react";
-import { render, screen, cleanup, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  cleanup,
+  waitFor,
+  waitForElementToBeRemoved,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { z } from "zod";
 import { ZodErrorViewer } from "./ZodErrorViewer";
@@ -20,6 +26,10 @@ const {
   SizeErrors,
   NotMultipleOfError,
   CustomError,
+  TruncatedArray,
+  StartTruncatedArray,
+  EndTruncatedArray,
+  NestedTruncatedArray,
   CustomTheme,
 } = composeStories(stories, Meta);
 
@@ -330,6 +340,146 @@ test("renders custom error message correctly", () => {
     4		"color": "blue"
     5	}
     6}
+    "
+  `);
+});
+
+test("renders truncated arrays correctly", async () => {
+  render(<TruncatedArray />);
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1[
+    2	// ... truncated ...
+    16	0, // Error: Expected string, received number
+    17	// ... truncated ...
+    28]
+    "
+  `);
+
+  userEvent.click(screen.getAllByRole("button", { name: "Expand" })[0]!);
+
+  await screen.findByText('"a"');
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1[
+    2	"a",// ... 
+    3	"b",
+    4	"c",
+    5	"d",
+    6	"e",
+    7	"f",
+    8	"g",
+    9	"h",
+    10	"i",
+    11	"j",
+    12	"k",
+    13	"l",
+    14	"m",
+    15	"n",
+    16	0, // Error: Expected string, received number
+    17	// ... truncated ...
+    28]
+    "
+  `);
+
+  userEvent.click(screen.getByRole("button", { name: "Expand" })!);
+
+  await screen.findByText('"z"');
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1[
+    2	"a",// ... 
+    3	"b",
+    4	"c",
+    5	"d",
+    6	"e",
+    7	"f",
+    8	"g",
+    9	"h",
+    10	"i",
+    11	"j",
+    12	"k",
+    13	"l",
+    14	"m",
+    15	"n",
+    16	0, // Error: Expected string, received number
+    17	"p",// ... 
+    18	"q",
+    19	"r",
+    20	"s",
+    21	"t",
+    22	"u",
+    23	"v",
+    24	"w",
+    25	"x",
+    26	"y",
+    27	"z"
+    28]
+    "
+  `);
+
+  userEvent.click(screen.getAllByRole("button", { name: "Collapse" })[0]!);
+  await waitForElementToBeRemoved(screen.queryByText('"a"'));
+  userEvent.click(screen.getByRole("button", { name: "Collapse" })!);
+  await waitForElementToBeRemoved(screen.queryByText('"z"'));
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1[
+    2	// ... truncated ...
+    16	0, // Error: Expected string, received number
+    17	// ... truncated ...
+    28]
+    "
+  `);
+});
+
+test("renders start truncated arrays correctly", () => {
+  render(<StartTruncatedArray />);
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1[
+    2	// ... truncated ...
+    16	0, // Error: Expected string, received number
+    17	"p",
+    18	"q",
+    19	"r"
+    20]
+    "
+  `);
+});
+
+test("renders end truncated arrays correctly", () => {
+  render(<EndTruncatedArray />);
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1[
+    2	"a",
+    3	"b",
+    4	"c",
+    5	0, // Error: Expected string, received number
+    6	// ... truncated ...
+    17]
+    "
+  `);
+});
+
+test("renders nested truncated arrays correctly", () => {
+  render(<NestedTruncatedArray />);
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{
+    2	"arr": [
+    3		// ... truncated ...
+    17		0, // Error: Expected string, received number
+    18		// ... truncated ...
+    29	]
+    30}
     "
   `);
 });
