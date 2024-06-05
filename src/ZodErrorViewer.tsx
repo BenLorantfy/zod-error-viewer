@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { type CSSProperties, useState, useMemo, useRef } from "react";
 import { flushSync } from "react-dom";
 import { z, ZodError, ZodIssue, ZodIssueCode } from "zod";
