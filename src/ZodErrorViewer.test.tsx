@@ -243,6 +243,30 @@ test("renders correctly for missing keys", () => {
   `);
 });
 
+test("renders correctly for missing key that is a discriminator", () => {
+  const data = {};
+  render(
+    <ZodErrorViewer
+      data={data}
+      error={
+        z
+          .discriminatedUnion("type", [
+            z.object({ type: z.literal("square") }),
+            z.object({ type: z.literal("circle") }),
+          ])
+          .safeParse(data).error
+      }
+    />,
+  );
+
+  expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`
+    "
+    1{ // Error: Object missing required key: 'type'
+    2}
+    "
+  `);
+});
+
 test("renders correctly for unreconizged keys", () => {
   render(<UnreconginzedKeys />);
   expect(`\n${document.body.innerText}\n`).toMatchInlineSnapshot(`

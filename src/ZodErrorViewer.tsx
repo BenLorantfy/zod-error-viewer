@@ -53,7 +53,7 @@ const srOnly: CSSProperties = {
  */
 export function ZodErrorViewer({
   data,
-  error,
+  error = new ZodError([]),
   theme = defaultTheme,
 }: {
   /**
@@ -63,7 +63,7 @@ export function ZodErrorViewer({
   /**
    * The zod error that was thrown when parsing the data
    */
-  error: z.ZodError;
+  error?: z.ZodError;
   /**
    * A custom theme to apply to the component
    */
@@ -90,6 +90,7 @@ export function ZodErrorViewer({
         path={[]}
         theme={mergedTheme}
         countLines={countLines}
+        rootData={data}
       />
     </div>
   );
@@ -108,6 +109,7 @@ function RecursiveViewer({
   onToggleTruncate,
   toggleButtonRef,
   truncated,
+  rootData,
 }: {
   propertyKey?: string;
   data: unknown;
@@ -121,6 +123,7 @@ function RecursiveViewer({
   onToggleTruncate?: () => void;
   toggleButtonRef?: React.RefObject<HTMLButtonElement>;
   truncated?: boolean;
+  rootData?: unknown;
 }) {
   const [unionErrorIndex, setSelectedUnionErrorIndex] = useState(0);
   const [truncateStart, setTruncateStart] = useState(true);
@@ -151,6 +154,7 @@ function RecursiveViewer({
         onToggleTruncate={onToggleTruncate}
         toggleButtonRef={toggleButtonRef}
         truncated={truncated}
+        rootData={rootData}
       />
     );
   }
@@ -197,6 +201,7 @@ function RecursiveViewer({
           onToggleTruncate={onToggleTruncate}
           toggleButtonRef={toggleButtonRef}
           truncated={truncated}
+          rootData={rootData}
         />
         {firstPart.length > 5 && truncateStart ? (
           <Line
@@ -215,6 +220,7 @@ function RecursiveViewer({
             indentation={indentation + 1}
             theme={theme}
             truncated
+            rootData={rootData}
           />
         ) : (
           firstPart.map((value, i) => {
@@ -242,6 +248,7 @@ function RecursiveViewer({
                     : undefined
                 }
                 toggleButtonRef={startToggleButtonRef}
+                rootData={rootData}
               />
             );
           })
@@ -260,6 +267,7 @@ function RecursiveViewer({
               path={[...path, i + firstPart.length]}
               theme={theme}
               countLines={countLines}
+              rootData={rootData}
             />
           );
         })}
@@ -280,6 +288,7 @@ function RecursiveViewer({
             truncated
             indentation={indentation + 1}
             theme={theme}
+            rootData={rootData}
           />
         ) : (
           thirdPart.map((value, i) => {
@@ -307,6 +316,7 @@ function RecursiveViewer({
                     : undefined
                 }
                 toggleButtonRef={endToggleButtonRef}
+                rootData={rootData}
               />
             );
           })
@@ -317,6 +327,7 @@ function RecursiveViewer({
           comma={comma}
           num={runningLineNum++}
           theme={theme}
+          rootData={rootData}
         />
       </>
     );
@@ -338,6 +349,7 @@ function RecursiveViewer({
         onToggleTruncate={onToggleTruncate}
         toggleButtonRef={toggleButtonRef}
         truncated={truncated}
+        rootData={rootData}
       />
       {entries.map(([key, value], i) => {
         runningLineNum += i === 0 ? 1 : countLines(entries[i - 1]?.[1]);
@@ -353,6 +365,7 @@ function RecursiveViewer({
             path={[...path, key]}
             theme={theme}
             countLines={countLines}
+            rootData={rootData}
           />
         );
       })}
@@ -368,6 +381,7 @@ function RecursiveViewer({
         comma={comma}
         path={path}
         theme={theme}
+        rootData={rootData}
       />
     </>
   );
@@ -393,19 +407,29 @@ function getUnionError({
   return unionIssue ? unionIssue.unionErrors[index] : undefined;
 }
 
-function getRelevantIssues(error: ZodError, path: Array<string | number>) {
+function getRelevantIssues({
+  error,
+  path = [],
+  rootData,
+}: {
+  error: ZodError;
+  path?: Array<string | number>;
+  rootData: unknown;
+}) {
   const relevantIssues =
     error.issues.filter((issue) => issue.path.join(".") === path?.join(".")) ||
     [];
 
   const missingKeys = [];
   for (const issue of error.issues) {
-    if (isMissing(issue, path)) {
+    if (isMissing({ issue, objPath: path, rootData })) {
       missingKeys.push(issue.path[issue.path.length - 1]);
     } else if (
       issue.code === ZodIssueCode.invalid_union &&
       issue.unionErrors.every((err) =>
-        err.issues.some((iss) => isMissing(iss, path)),
+        err.issues.some((iss) =>
+          isMissing({ issue: iss, objPath: path, rootData }),
+        ),
       )
     ) {
       missingKeys.push(issue.path[issue.path.length - 1]);
@@ -426,11 +450,19 @@ function getRelevantIssues(error: ZodError, path: Array<string | number>) {
   return relevantIssues;
 }
 
-function isMissing(issue: ZodIssue, path: Array<string | number>) {
+function isMissing({
+  issue,
+  objPath,
+  rootData,
+}: {
+  issue: ZodIssue;
+  objPath: Array<string | number>;
+  rootData: unknown;
+}) {
   if (
     issue.code === ZodIssueCode.invalid_type &&
     issue.received === "undefined" &&
-    issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+    issue.path.slice(0, issue.path.length - 1).join(".") === objPath.join(".")
   ) {
     return true;
   }
@@ -438,7 +470,16 @@ function isMissing(issue: ZodIssue, path: Array<string | number>) {
   if (
     issue.code === ZodIssueCode.invalid_literal &&
     typeof issue.received === "undefined" &&
-    issue.path.slice(0, issue.path.length - 1).join(".") === path.join(".")
+    issue.path.slice(0, issue.path.length - 1).join(".") === objPath.join(".")
+  ) {
+    return true;
+  }
+
+  if (
+    issue.code === ZodIssueCode.invalid_union_discriminator &&
+    issue.path.slice(0, issue.path.length - 1).join(".") ===
+      objPath.join(".") &&
+    typeof getValueAtPath(rootData, issue.path) === "undefined"
   ) {
     return true;
   }
@@ -461,6 +502,7 @@ function Line({
   onToggleTruncate,
   toggleButtonRef,
   truncated,
+  rootData,
 }: {
   num: number;
   value?: unknown;
@@ -476,8 +518,9 @@ function Line({
   onToggleTruncate?: () => void;
   toggleButtonRef?: React.RefObject<HTMLButtonElement>;
   truncated?: boolean;
+  rootData: unknown;
 }) {
-  const issues = error ? getRelevantIssues(error, path || []) : [];
+  const issues = error ? getRelevantIssues({ error, path, rootData }) : [];
   const issue = issues[0];
   const unionError =
     error &&
@@ -620,7 +663,11 @@ function Line({
                   />
                   {`: `}
                   {unionError
-                    ? getRelevantIssues(unionError, path)[0]?.message
+                    ? getRelevantIssues({
+                        error: unionError,
+                        path,
+                        rootData,
+                      })[0]?.message
                     : undefined}
                 </>
               )}
@@ -799,4 +846,19 @@ function findLastIndex<T>(
   }
 
   return -1;
+}
+
+function getValueAtPath(data: unknown, path: Array<string | number>) {
+  let value = data;
+  for (const pathPart of path) {
+    if (typeof value === "object" && value) {
+      if (pathPart in value) {
+        // @ts-expect-error Not sure how to narrow this so TS is okay
+        value = value[pathPart];
+      } else {
+        return undefined;
+      }
+    }
+  }
+  return value;
 }

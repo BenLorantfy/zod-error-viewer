@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ZodErrorViewer } from "./ZodErrorViewer";
 import { z } from "zod";
+import { useMemo, useState } from "react";
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
@@ -451,4 +452,161 @@ export const CustomTheme: Story = {
       truncation: "#d3d3d3",
     },
   },
+};
+
+function PlaygroundView() {
+  const [dataStr, setDataStr] = useState("");
+  const [errorStr, setErrorStr] = useState("");
+  const [schemaStr, setSchemaStr] = useState("");
+
+  const data = useMemo(() => {
+    try {
+      return JSON.parse(dataStr);
+    } catch (err) {
+      return null;
+    }
+  }, [dataStr]);
+
+  const { schema, schemaEvalError } = useMemo(() => {
+    try {
+      Object.assign(window, { z });
+      const schema = eval(`const z = window.z; ${schemaStr}`);
+      if (!schema || !("_def" in schema)) {
+        return {
+          schema: null,
+          schemaEvalError:
+            schemaStr.trim().length > 0 ? new Error("Missing schema") : null,
+        };
+      }
+      return {
+        schema,
+        schemaEvalError: null,
+      };
+    } catch (err) {
+      return {
+        schema: null,
+        schemaEvalError:
+          err instanceof Error ? err : new Error("Unknown error"),
+      };
+    }
+  }, [schemaStr]);
+
+  const { error, errorParseError } = useMemo(() => {
+    if (errorStr.trim().length !== 0) {
+      try {
+        return { error: JSON.parse(errorStr) };
+      } catch (err) {
+        return {
+          error: undefined,
+          errorParseError:
+            err instanceof Error ? err : new Error("Unknown error"),
+        };
+      }
+    }
+
+    if (!schema) {
+      return {
+        error: undefined,
+        errorParseError: undefined,
+      };
+    }
+
+    try {
+      return { error: schema.safeParse(data).error };
+    } catch (err) {
+      return {
+        error: undefined,
+        errorParseError:
+          err instanceof Error ? err : new Error("Unknown error"),
+      };
+    }
+  }, [errorStr, schema, data]);
+
+  return (
+    <div>
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          width: "800px",
+          maxWidth: "100%",
+        }}
+      >
+        <label
+          style={{
+            display: "block",
+            flexBasis: "33.33%",
+          }}
+        >
+          Data
+          <textarea
+            value={dataStr}
+            onChange={(e) => setDataStr(e.currentTarget.value)}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "300px",
+            }}
+          ></textarea>
+        </label>
+        <div
+          style={{
+            flexBasis: "33.33%",
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+            }}
+          >
+            Error (Optional)
+            <textarea
+              value={errorStr}
+              onChange={(e) => setErrorStr(e.currentTarget.value)}
+              style={{
+                display: "block",
+                width: "100%",
+                height: "300px",
+              }}
+              placeholder="Paste output of `JSON.stringify(zodError)` here"
+              aria-describedby="error-error"
+            ></textarea>
+          </label>
+          <div id="error-error" role="alert">
+            {errorParseError?.message
+              ? `Failed to parse error: ${errorParseError.message}`
+              : ""}
+          </div>
+        </div>
+        <label
+          style={{
+            display: "block",
+            flexBasis: "33.33%",
+          }}
+        >
+          Schema (Optional)
+          <textarea
+            value={schemaStr}
+            onChange={(e) => setSchemaStr(e.currentTarget.value)}
+            style={{
+              display: "block",
+              width: "100%",
+              height: "300px",
+            }}
+            aria-describedby="schema-eval-error"
+          />
+          <div id="schema-eval-error" role="alert">
+            {schemaEvalError?.message
+              ? `Failed to parse schema: ${schemaEvalError.message}`
+              : ""}
+          </div>
+        </label>
+      </div>
+      <ZodErrorViewer data={data} error={error} />
+    </div>
+  );
+}
+
+export const Playground = {
+  render: () => <PlaygroundView />,
 };
