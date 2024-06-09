@@ -55,6 +55,7 @@ export function ZodErrorViewer({
   data,
   error = new ZodError([]),
   theme = defaultTheme,
+  height,
 }: {
   /**
    * The data that was parsed when the error occurred
@@ -68,6 +69,11 @@ export function ZodErrorViewer({
    * A custom theme to apply to the component
    */
   theme?: Partial<typeof defaultTheme>;
+
+  /**
+   * Set to `fill` to fill the parent container
+   */
+  height?: "fill";
 }) {
   const mergedTheme = {
     ...defaultTheme,
@@ -82,16 +88,36 @@ export function ZodErrorViewer({
         fontSize: "1rem",
         whiteSpace: "nowrap",
         background: mergedTheme.background,
+        position: "relative",
+        height: height === "fill" ? "100%" : undefined,
       }}
     >
-      <RecursiveViewer
-        data={data}
-        error={error}
-        path={[]}
-        theme={mergedTheme}
-        countLines={countLines}
-        rootData={data}
+      <div
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          bottom: 0,
+          width: "52px",
+          backgroundColor: theme.lineNumberBackground,
+        }}
       />
+      <div
+        style={{
+          position: "relative",
+          height: height === "fill" ? "100%" : undefined,
+          overflow: height === "fill" ? "auto" : undefined,
+        }}
+      >
+        <RecursiveViewer
+          data={data}
+          error={error}
+          path={[]}
+          theme={mergedTheme}
+          countLines={countLines}
+          rootData={data}
+        />
+      </div>
     </div>
   );
 }
@@ -541,13 +567,14 @@ function Line({
         style={{
           padding: "4px",
           paddingRight: "8px",
+          width: "52px",
           backgroundColor: theme.lineNumberBackground,
-          width: "40px",
           display: "inline-block",
           textAlign: "right",
           fontFamily: "monospace",
           userSelect: "none",
           color: theme.lineNumber,
+          boxSizing: "border-box",
         }}
       >
         {num}
@@ -560,6 +587,7 @@ function Line({
           fontFamily: "monospace",
           tabSize: "24px",
           margin: 0,
+          boxSizing: "border-box",
         }}
       >
         {/* INDENTATION */}
@@ -600,6 +628,7 @@ function Line({
             ref={toggleButtonRef}
             aria-label={truncated ? "Expand" : "Collapse"}
             style={{
+              boxSizing: "border-box",
               appearance: "none",
               background: "none",
               border: "none",
@@ -617,7 +646,12 @@ function Line({
             }}
           >
             <span
-              style={{ position: "relative", top: "-0.2rem", left: "0.04rem" }}
+              style={{
+                boxSizing: "border-box",
+                position: "relative",
+                top: "-0.2rem",
+                left: "0.04rem",
+              }}
             >
               {/* Only show // when copying / pasting text.  This is so the JSON can still be parsed (if using jsonc) */}
               <span aria-hidden style={srOnly}>

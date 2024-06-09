@@ -14,9 +14,10 @@ jobs:
         with:
           fetch-depth: 2
       - run: pnpm install
-      - run: pnpm test
       - run: pnpm lint
       - run: pnpm format:check
+      - run: cd packages/zod-error-viewer
+      - run: pnpm test
       - run: pnpm build
       - name: Publish package
         run: |
