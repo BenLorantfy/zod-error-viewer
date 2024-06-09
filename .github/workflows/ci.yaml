@@ -16,10 +16,12 @@ jobs:
       - run: pnpm install
       - run: pnpm lint
       - run: pnpm format:check
-      - run: cd packages/zod-error-viewer
       - run: pnpm test
+        working-directory: packages/zod-error-viewer
       - run: pnpm build
+        working-directory: packages/zod-error-viewer
       - name: Publish package
+        working-directory: packages/zod-error-viewer
         run: |
           if [ $GITHUB_REF != "refs/heads/main" ]; then
             echo "Branch is not main, skipping publish step"
@@ -46,9 +48,10 @@ jobs:
           pnpm publish
       - name: Build documentation
         run: pnpm build-storybook
+        working-directory: packages/zod-error-viewer
       - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: storybook-static
+          path: packages/zod-error-viewer/storybook-static
       - name: Publish documentation
         uses: actions/deploy-pages@v4

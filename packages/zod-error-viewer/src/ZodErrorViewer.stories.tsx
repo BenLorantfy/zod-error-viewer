@@ -1,4 +1,3 @@
-import "./playground.css";
 import type { Meta, StoryObj } from "@storybook/react";
 import { ZodErrorViewer } from "./ZodErrorViewer";
 import { z } from "zod";
