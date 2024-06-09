@@ -1,5 +1,6 @@
 // @vitest-environment happy-dom
 
+import * as React from "react";
 import { test, expect, beforeEach } from "vitest";
 import Meta, * as stories from "./ZodErrorViewer.stories";
 import { composeStories } from "@storybook/react";
