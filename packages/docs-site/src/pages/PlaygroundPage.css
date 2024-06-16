@@ -1,0 +1,70 @@
+.playground {
+  font-family: sans-serif;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+
+  h1,
+  h2 {
+    margin: 0;
+    font-weight: 400;
+    color: #595959;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    padding: 8px;
+    font-size: 1.2rem;
+    background-color: rgb(245, 245, 245);
+  }
+
+  main {
+    padding: 16px;
+    flex-grow: 1;
+    overflow: auto;
+  }
+
+  .error {
+    color: red;
+    min-height: 30px;
+    padding-top: 4px;
+  }
+
+  .editor-column {
+    flex-basis: 33.33%;
+  }
+
+  .editor {
+    border: 1px solid rgb(221, 221, 221);
+  }
+
+  .error-viewer-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .error-viewer {
+    flex-grow: 1;
+    flex-basis: 0;
+    overflow: hidden;
+  }
+
+  .tag {
+    display: inline-block;
+    border-radius: 8px;
+    background-color: #dedede;
+    padding: 8px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    vertical-align: middle;
+    font-size: 0.9rem;
+  }
+}
