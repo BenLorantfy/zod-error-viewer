@@ -1,16 +1,3 @@
-html,
-body {
-  height: 100%;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-#storybook-root {
-  height: 100%;
-}
-
 .playground {
   font-family: sans-serif;
   width: 100%;
@@ -18,11 +5,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-
-  main {
-    display: flex;
-    flex-direction: column;
-  }
+  padding: 16px;
 
   h1,
   h2 {
@@ -40,39 +23,6 @@ body {
     padding: 8px;
     font-size: 1.2rem;
     background-color: rgb(245, 245, 245);
-  }
-
-  nav {
-    background-color: rgb(247, 249, 252);
-    flex-grow: 0;
-    display: flex;
-
-    ul {
-      list-style-type: none;
-      margin: 0;
-      padding: 0;
-      display: flex;
-
-      li {
-        height: 100%;
-
-        a {
-          padding: 16px;
-          display: flex;
-          align-items: center;
-          text-decoration: none;
-          color: #595959;
-        }
-
-        a:hover {
-          background-color: #dcddde;
-        }
-
-        a:active {
-          background-color: #c7c8c9;
-        }
-      }
-    }
   }
 
   main {

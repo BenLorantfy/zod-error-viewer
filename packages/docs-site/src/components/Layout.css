@@ -1,0 +1,43 @@
+.content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+nav {
+  background-color: rgb(247, 249, 252);
+  flex-grow: 0;
+  display: flex;
+
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+
+    li {
+      height: 100%;
+
+      a {
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #595959;
+      }
+
+      a:hover {
+        background-color: #dcddde;
+      }
+
+      a:active {
+        background-color: #c7c8c9;
+      }
+    }
+  }
+}
