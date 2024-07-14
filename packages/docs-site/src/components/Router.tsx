@@ -42,8 +42,8 @@ export function Route({
   path: string;
   children: React.ReactNode;
 }) {
-  useContext(CounterContext);
-  if (path !== window.location.pathname) {
+  const pathname = usePathname();
+  if (path !== pathname) {
     return null;
   }
 
