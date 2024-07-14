@@ -15,7 +15,7 @@ export function App() {
         </Route>
         <Route path="/docs">
           <iframe
-            src="http://localhost:6007/"
+            src="/storybook-static"
             style={{ width: "100%", height: "100%", border: 0 }}
           />
         </Route>

@@ -54,6 +54,13 @@ jobs:
         run: pnpm build
       - name: Move storybook to under docs site
         run: mv ./packages/zod-error-viewer/storybook-static ./packages/docs-site/dist/storybook-static
+      # Workaround since github pages does not support routing all requests to index.html
+      - name: Create fake pages
+        run: |
+          mkdir ./packages/docs-site/dist/docs
+          cp ./packages/docs-site/dist/index.html ./packages/docs-site/dist/docs/index.html
+          mkdir ./packages/docs-site/dist/playground
+          cp ./packages/docs-site/dist/index.html ./packages/docs-site/dist/playground/index.html
       - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v3
         with:
