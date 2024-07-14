@@ -27,7 +27,12 @@ export function Router({ children }: { children: React.ReactNode }) {
 
 export function usePathname() {
   useContext(CounterContext);
-  return window.location.pathname;
+  const pathname = window.location.pathname;
+  if (pathname.endsWith("/")) {
+    return pathname.substring(0, pathname.length - 1);
+  }
+
+  return pathname;
 }
 
 export function Route({
