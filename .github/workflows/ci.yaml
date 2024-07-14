@@ -14,11 +14,14 @@ jobs:
         with:
           fetch-depth: 2
       - run: pnpm install
-      - run: pnpm test
       - run: pnpm lint
       - run: pnpm format:check
+      - run: pnpm test
+        working-directory: packages/zod-error-viewer
       - run: pnpm build
+        working-directory: packages/zod-error-viewer
       - name: Publish package
+        working-directory: packages/zod-error-viewer
         run: |
           if [ $GITHUB_REF != "refs/heads/main" ]; then
             echo "Branch is not main, skipping publish step"
@@ -27,7 +30,7 @@ jobs:
 
           echo "Branch is main, proceeding..."
 
-          prev_version=$(git show HEAD~1:package.json | jq -r '.version')
+          prev_version=$(git show HEAD~1:packages/zod-error-viewer/package.json | jq -r '.version')
           new_version=$(cat package.json | jq -r '.version')
 
           if [ $prev_version = $new_version ]; then
@@ -43,11 +46,24 @@ jobs:
 
           echo "Publishing package..."
           pnpm publish
-      - name: Build documentation
+      - name: Build storybook
+        working-directory: packages/zod-error-viewer
         run: pnpm build-storybook
+      - name: Build docs site
+        working-directory: packages/docs-site
+        run: pnpm build
+      - name: Move storybook to under docs site
+        run: mv ./packages/zod-error-viewer/storybook-static ./packages/docs-site/dist/storybook-static
+      # Workaround since github pages does not support routing all requests to index.html
+      - name: Create fake pages
+        run: |
+          mkdir ./packages/docs-site/dist/docs
+          cp ./packages/docs-site/dist/index.html ./packages/docs-site/dist/docs/index.html
+          mkdir ./packages/docs-site/dist/playground
+          cp ./packages/docs-site/dist/index.html ./packages/docs-site/dist/playground/index.html
       - name: Upload documentation artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: storybook-static
+          path: packages/docs-site/dist
       - name: Publish documentation
         uses: actions/deploy-pages@v4
