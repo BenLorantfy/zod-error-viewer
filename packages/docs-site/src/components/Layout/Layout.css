@@ -1,0 +1,53 @@
+.Layout {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.Layout main {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.Layout nav {
+  background-color: rgb(247, 249, 252);
+  flex-grow: 0;
+  display: flex;
+  border-bottom: 1px solid rgb(220, 220, 220);
+}
+
+.Layout nav ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+.Layout nav li {
+  height: 100%;
+}
+
+.Layout nav a {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: #595959;
+  transition: all 0.1s;
+}
+
+.Layout nav a:hover {
+  background-color: #e7e7e7;
+}
+
+.Layout nav a:focus {
+  background-color: #e7e7e7;
+}
+
+.Layout nav a:active {
+  background-color: #dddddd;
+}
+
+.Layout nav a[aria-current="page"] {
+  background-color: #dddddd;
+}

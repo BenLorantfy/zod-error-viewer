@@ -83,7 +83,7 @@ export function PlaygroundPage() {
   }, [errorStr, schema, data]);
 
   return (
-    <div className="playground">
+    <div className="PlaygroundPage">
       <h1>Playground</h1>
       <div
         style={{

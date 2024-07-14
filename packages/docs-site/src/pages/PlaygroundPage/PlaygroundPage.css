@@ -1,0 +1,64 @@
+.PlaygroundPage {
+  font-family: sans-serif;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+}
+
+.PlaygroundPage h1,
+.PlaygroundPage h2 {
+  margin: 0;
+  font-weight: 400;
+  color: #595959;
+}
+
+.PlaygroundPage h1 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.PlaygroundPage h2 {
+  padding: 8px;
+  font-size: 1.2rem;
+  background-color: rgb(245, 245, 245);
+}
+
+.PlaygroundPage .error {
+  color: red;
+  min-height: 30px;
+  padding-top: 4px;
+}
+
+.PlaygroundPage .editor-column {
+  flex-basis: 33.33%;
+}
+
+.PlaygroundPage .editor {
+  border: 1px solid rgb(221, 221, 221);
+}
+
+.PlaygroundPage .error-viewer-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.PlaygroundPage .error-viewer {
+  flex-grow: 1;
+  flex-basis: 0;
+  overflow: hidden;
+}
+
+.PlaygroundPage .tag {
+  display: inline-block;
+  border-radius: 8px;
+  background-color: #dedede;
+  padding: 8px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  vertical-align: middle;
+  font-size: 0.9rem;
+}

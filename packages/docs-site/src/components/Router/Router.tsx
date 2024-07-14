@@ -58,10 +58,12 @@ export function Link({
   href,
   children,
   "aria-current": ariaCurrent,
+  className,
 }: {
   href: string;
   children: React.ReactNode;
   "aria-current"?: "page";
+  className?: string;
 }) {
   const setCount = useContext(SetCounterContext);
   return (
@@ -84,6 +86,7 @@ export function Link({
         setCount((c) => c + 1);
       }}
       aria-current={ariaCurrent}
+      className={className}
     >
       {children}
     </a>

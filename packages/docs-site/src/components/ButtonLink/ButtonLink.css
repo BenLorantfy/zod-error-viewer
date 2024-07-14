@@ -1,4 +1,4 @@
-.buttonLink {
+.ButtonLink {
   background-color: rgb(24, 38, 63);
   color: white;
   text-decoration: none;
@@ -15,14 +15,10 @@
   margin-top: 8px;
 }
 
-.buttonLink:hover {
+.ButtonLink:hover {
   background-color: rgb(55, 73, 105);
 }
 
-.buttonLink:focus {
+.ButtonLink:focus {
   background-color: rgb(55, 73, 105);
-}
-
-p {
-  font-size: large;
 }

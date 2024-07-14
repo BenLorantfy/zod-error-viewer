@@ -1,7 +1,7 @@
 import { ZodErrorViewer } from "zod-error-viewer";
-import logo from "../assets/logo.png";
+import logo from "../../assets/logo.png";
 import { z } from "zod";
-import "./HomePage.css";
+import { ButtonLink } from "../../components/ButtonLink";
 
 export function HomePage() {
   const data = {
@@ -30,20 +30,11 @@ export function HomePage() {
     >
       <img src={logo} style={{ width: "150px", maxWidth: "100%" }} />
       <h1>ZodErrorViewer</h1>
-      <p>Quickly understand even the meanest zod errors 💡</p>
+      <p style={{ fontSize: "large" }}>
+        Quickly understand even the meanest zod errors 💡
+      </p>
       <ZodErrorViewer data={data} error={error} />
-      <a className="buttonLink" href="/docs">
-        Documentation
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width={24}
-          height={24}
-          fill="currentColor"
-          viewBox="0 -960 960 960"
-        >
-          <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
-        </svg>
-      </a>
+      <ButtonLink href="/docs" label="Documentation" />
     </div>
   );
 }

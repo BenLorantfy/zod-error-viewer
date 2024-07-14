@@ -1,5 +1,5 @@
-import { Link, usePathname } from "./Router";
-import logo from "../assets/logo.png";
+import { Link, usePathname } from "../Router";
+import logo from "../../assets/logo.png";
 import "./Layout.css";
 
 function Nav() {
@@ -51,7 +51,7 @@ function Nav() {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="content">
+    <div className="Layout">
       <Nav />
       <main>{children}</main>
     </div>
