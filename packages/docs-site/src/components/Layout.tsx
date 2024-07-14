@@ -1,13 +1,14 @@
-import { Link } from "./Router";
+import { Link, usePathname } from "./Router";
 import logo from "../assets/logo.png";
 import "./Layout.css";
 
 function Nav() {
+  const pathname = usePathname();
   return (
     <nav>
       <ul>
         <li>
-          <Link href="/">
+          <Link href="/" aria-current={pathname === "/" ? "page" : undefined}>
             <span
               style={{
                 display: "inline-block",
@@ -28,10 +29,20 @@ function Nav() {
           </Link>
         </li>
         <li>
-          <Link href="/docs">Docs</Link>
+          <Link
+            href="/docs"
+            aria-current={pathname === "/docs" ? "page" : undefined}
+          >
+            Docs
+          </Link>
         </li>
         <li>
-          <Link href="/playground">Playground</Link>
+          <Link
+            href="/playground"
+            aria-current={pathname === "/playground" ? "page" : undefined}
+          >
+            Playground
+          </Link>
         </li>
       </ul>
     </nav>

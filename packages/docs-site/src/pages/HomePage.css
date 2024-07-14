@@ -1,0 +1,28 @@
+.buttonLink {
+  background-color: rgb(24, 38, 63);
+  color: white;
+  text-decoration: none;
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  border-radius: 8px;
+  font-size: large;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  outline-offset: 2px;
+  margin-top: 8px;
+}
+
+.buttonLink:hover {
+  background-color: rgb(55, 73, 105);
+}
+
+.buttonLink:focus {
+  background-color: rgb(55, 73, 105);
+}
+
+p {
+  font-size: large;
+}

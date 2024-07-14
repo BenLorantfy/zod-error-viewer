@@ -25,6 +25,11 @@ export function Router({ children }: { children: React.ReactNode }) {
   );
 }
 
+export function usePathname() {
+  useContext(CounterContext);
+  return window.location.pathname;
+}
+
 export function Route({
   path,
   children,
@@ -43,9 +48,11 @@ export function Route({
 export function Link({
   href,
   children,
+  "aria-current": ariaCurrent,
 }: {
   href: string;
   children: React.ReactNode;
+  "aria-current"?: "page";
 }) {
   const setCount = useContext(SetCounterContext);
   return (
@@ -67,6 +74,7 @@ export function Link({
         window.history.pushState({}, "", href);
         setCount((c) => c + 1);
       }}
+      aria-current={ariaCurrent}
     >
       {children}
     </a>
