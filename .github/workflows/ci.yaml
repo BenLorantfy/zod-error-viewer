@@ -52,7 +52,6 @@ jobs:
       - name: Build docs site
         working-directory: packages/docs-site
         run: pnpm build
-        working-directory: packages/zod-error-viewer
       - name: Move storybook to under docs site
         run: mv ./packages/zod-error-viewer/storybook-static ./packages/docs-site/dist/storybook-static
       - name: Upload documentation artifact
