@@ -6,6 +6,7 @@ import { flushSync } from "react-dom";
 import { z, ZodError, ZodIssue, ZodIssueCode } from "zod";
 
 const defaultTheme = {
+  fontSize: "1rem",
   lineNumber: "black",
   lineNumberBackground: "#f0f0f0",
   string: "#95261f",
@@ -29,12 +30,10 @@ const buttonStyle = (theme: typeof defaultTheme): CSSProperties => ({
   backgroundColor: theme.errorForeground,
   color: theme.background,
   border: "none",
-  fontSize: "0.75rem",
+  fontSize: "0.75em",
   cursor: "pointer",
-  padding: "2px",
-  paddingLeft: "6px",
-  paddingRight: "6px",
   userSelect: "none",
+  verticalAlign: "middle",
 });
 
 const srOnly: CSSProperties = {
@@ -86,38 +85,33 @@ export function ZodErrorViewer({
   return (
     <div
       style={{
-        fontSize: "1rem",
+        fontSize: mergedTheme.fontSize,
         whiteSpace: "nowrap",
         background: mergedTheme.background,
         position: "relative",
         height: height === "fill" ? "100%" : undefined,
+        maxWidth: "100%",
+        overflowX: "hidden",
       }}
     >
       <div
         style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          bottom: 0,
-          width: "52px",
-          backgroundColor: theme.lineNumberBackground,
-        }}
-      />
-      <div
-        style={{
           position: "relative",
           height: height === "fill" ? "100%" : undefined,
-          overflow: height === "fill" ? "auto" : undefined,
+          overflow: "auto",
+          maxWidth: "100%",
         }}
       >
-        <RecursiveViewer
-          data={data}
-          error={error}
-          path={[]}
-          theme={mergedTheme}
-          countLines={countLines}
-          rootData={data}
-        />
+        <div style={{ width: "max-content" }}>
+          <RecursiveViewer
+            data={data}
+            error={error}
+            path={[]}
+            theme={mergedTheme}
+            countLines={countLines}
+            rootData={data}
+          />
+        </div>
       </div>
     </div>
   );
@@ -562,13 +556,13 @@ function Line({
     <div
       style={{
         backgroundColor: issues.length > 0 ? theme.errorBackground : undefined,
+        height: "1.65em",
       }}
     >
-      <div
+      <span
         style={{
-          padding: "4px",
-          paddingRight: "8px",
-          width: "52px",
+          width: "3.25em",
+          paddingRight: "0.3em",
           backgroundColor: theme.lineNumberBackground,
           display: "inline-block",
           textAlign: "right",
@@ -576,19 +570,28 @@ function Line({
           userSelect: "none",
           color: theme.lineNumber,
           boxSizing: "border-box",
+          height: "1.65em",
+          lineHeight: "1.65em",
+          overflow: "hidden",
+          position: "sticky",
+          left: 0,
+          zIndex: 1,
         }}
       >
         {num}
-      </div>
+      </span>
       <pre
         style={{
           display: "inline-block",
-          paddingLeft: "8px",
-          paddingRight: "16px",
+          paddingLeft: "0.3em",
+          paddingRight: "0.6em",
           fontFamily: "monospace",
-          tabSize: "24px",
+          tabSize: "1.5em",
           margin: 0,
           boxSizing: "border-box",
+          height: "1.65em",
+          lineHeight: "1.65em",
+          overflow: "hidden",
         }}
       >
         {/* INDENTATION */}
@@ -634,7 +637,7 @@ function Line({
               background: "none",
               border: "none",
               backgroundColor: theme.truncationBackground,
-              borderRadius: "4px",
+              borderRadius: "0.25em",
               cursor: "pointer",
               fontFamily: "monospace",
               letterSpacing: "-0.2rem",
@@ -734,13 +737,19 @@ function ErrorSwitcher({
         style={{
           display: "inline-block",
           border: `1px solid ${theme.errorForeground}`,
-          borderRadius: "4px",
-          fontSize: "0.85rem",
+          borderRadius: "0.25em",
+          fontSize: "0.85em",
           backgroundColor: theme.background,
+          lineHeight: 0,
+          verticalAlign: "middle",
         }}
       >
         <span
-          style={{ padding: "2px", paddingLeft: "8px", paddingRight: "8px" }}
+          style={{
+            paddingLeft: "0.5em",
+            paddingRight: "0.5em",
+            verticalAlign: "middle",
+          }}
         >
           {index + 1}/{max}
         </span>
@@ -781,9 +790,9 @@ function ChevronLeftIcon() {
       aria-hidden
       style={{ position: "relative", top: "1px" }}
       xmlns="http://www.w3.org/2000/svg"
-      height="14px"
+      height="1.5em"
       viewBox="0 -960 960 960"
-      width="14px"
+      width="1.5em"
       fill="currentColor"
     >
       <path d="M560-240 320-480l240-240 56 56-184 184 184 184-56 56Z" />
@@ -797,9 +806,9 @@ function ChevronRightIcon() {
       aria-hidden
       style={{ position: "relative", top: "1px" }}
       xmlns="http://www.w3.org/2000/svg"
-      height="14px"
+      height="1.5em"
       viewBox="0 -960 960 960"
-      width="14px"
+      width="1.5em"
       fill="currentColor"
     >
       <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
@@ -812,16 +821,16 @@ function ErrorIcon() {
     <svg
       aria-hidden
       style={{
-        marginLeft: "16px",
-        marginRight: "6px",
+        marginLeft: "1em",
+        marginRight: "0.4em",
         display: "inline",
-        position: "relative",
-        top: "3px",
         userSelect: "none",
+        verticalAlign: "middle",
+        marginTop: "-0.15em",
       }}
       xmlns="http://www.w3.org/2000/svg"
-      width="16"
-      height="16"
+      width="1em"
+      height="1em"
       viewBox="0 0 20 20"
     >
       <path

@@ -44,6 +44,10 @@ jobs:
           pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}
           echo "Set auth token"
 
+          echo "Copying README and README images from monorepo root"
+          cp -r ../../img .
+          cp ../../README.md .
+
           echo "Publishing package..."
           pnpm publish
       - name: Build storybook

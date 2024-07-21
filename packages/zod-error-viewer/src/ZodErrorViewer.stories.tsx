@@ -433,6 +433,7 @@ export const CustomTheme: Story = {
       })
       .safeParse(customThemeData).error!,
     theme: {
+      fontSize: "1.5rem",
       background: "#1e1e1e",
       key: "#a3d2f0",
       errorBackground: "#30201e",
