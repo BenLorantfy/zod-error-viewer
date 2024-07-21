@@ -16,7 +16,7 @@
 
 ## Motivation
 
-Zod is an amazing library. However, hairy zod errors can take a while to understand. The goal of `zod-error-viewer` is to drastically cut down on the time it takes to read and understand even the most complex zod errors.
+Zod is a game changer for building quality software. However, hairy zod errors can take a while to understand. The goal of `zod-error-viewer` is to drastically cut down on the time it takes to read and understand even the most complex zod errors.
 
 ## Getting Started
 

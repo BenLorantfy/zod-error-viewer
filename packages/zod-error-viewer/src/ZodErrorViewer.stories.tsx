@@ -451,5 +451,9 @@ export const CustomTheme: Story = {
       truncationBackground: "#4b4b4b",
       truncation: "#d3d3d3",
     },
+    height: "fill",
+  },
+  parameters: {
+    layout: "fullscreen",
   },
 };

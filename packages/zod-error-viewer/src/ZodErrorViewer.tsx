@@ -96,10 +96,21 @@ export function ZodErrorViewer({
     >
       <div
         style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          height: height === "fill" ? "100%" : 0,
+          width: "3.25em",
+          backgroundColor: mergedTheme.lineNumberBackground,
+        }}
+      ></div>
+      <div
+        style={{
           position: "relative",
           height: height === "fill" ? "100%" : undefined,
           overflow: "auto",
           maxWidth: "100%",
+          lineHeight: 0,
         }}
       >
         <div style={{ width: "max-content" }}>
