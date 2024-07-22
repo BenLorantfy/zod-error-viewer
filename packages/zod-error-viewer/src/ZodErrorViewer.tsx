@@ -620,12 +620,12 @@ function Line({
           <span style={{ color: theme.string }}>
             {`"`}
             {value.split("\n").map((line, idx, arr) => (
-              <span>
+              <>
                 {line}
                 {idx !== arr.length - 1 && (
                   <span style={{ color: theme.newline }}>{"↵"}</span>
                 )}
-              </span>
+              </>
             ))}
             {`"`}
           </span>
