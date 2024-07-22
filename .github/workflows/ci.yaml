@@ -49,7 +49,7 @@ jobs:
           cp ../../README.md .
 
           echo "Publishing package..."
-          pnpm publish
+          pnpm publish --no-git-checks
       - name: Build storybook
         working-directory: packages/zod-error-viewer
         run: pnpm build-storybook
