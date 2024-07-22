@@ -23,6 +23,7 @@ const defaultTheme = {
   comma: "black",
   truncation: "#616161",
   truncationBackground: "#edf2ff",
+  newline: "#da2f20",
 };
 
 const buttonStyle = (theme: typeof defaultTheme): CSSProperties => ({
@@ -90,7 +91,7 @@ export function ZodErrorViewer({
         background: mergedTheme.background,
         position: "relative",
         height: height === "fill" ? "100%" : undefined,
-        maxWidth: "100%",
+        width: "100%",
         overflowX: "hidden",
       }}
     >
@@ -109,11 +110,11 @@ export function ZodErrorViewer({
           position: "relative",
           height: height === "fill" ? "100%" : undefined,
           overflow: "auto",
-          maxWidth: "100%",
+          width: "100%",
           lineHeight: 0,
         }}
       >
-        <div style={{ width: "max-content" }}>
+        <div style={{ width: "max-content", minWidth: "100%" }}>
           <RecursiveViewer
             data={data}
             error={error}
@@ -616,7 +617,18 @@ function Line({
 
         {/* VALUE */}
         {typeof value === "string" && (
-          <span style={{ color: theme.string }}>{`"${value}"`}</span>
+          <span style={{ color: theme.string }}>
+            {`"`}
+            {value.split("\n").map((line, idx, arr) => (
+              <span>
+                {line}
+                {idx !== arr.length - 1 && (
+                  <span style={{ color: theme.newline }}>{"↵"}</span>
+                )}
+              </span>
+            ))}
+            {`"`}
+          </span>
         )}
         {typeof value === "number" && (
           <span style={{ color: theme.number }}>{value}</span>

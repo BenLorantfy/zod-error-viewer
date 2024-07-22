@@ -407,7 +407,7 @@ export const NestedTruncatedArray: Story = {
 
 const customThemeData = {
   myObject: {
-    myStr: "hello",
+    myStr: "hello\nsir\nhow\nare\nyou",
     myNum: 42,
     myBool: true,
     myNull: null,
@@ -450,6 +450,7 @@ export const CustomTheme: Story = {
       lineNumber: "#848484",
       truncationBackground: "#4b4b4b",
       truncation: "#d3d3d3",
+      newline: "#d2bb85",
     },
     height: "fill",
   },
