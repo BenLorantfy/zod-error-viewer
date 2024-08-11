@@ -33,7 +33,9 @@ export function HomePage() {
       <p style={{ fontSize: "large" }}>
         Quickly understand even the meanest zod errors 💡
       </p>
-      <ZodErrorViewer data={data} error={error} />
+      <div style={{ width: "1200px", maxWidth: "100%" }}>
+        <ZodErrorViewer data={data} error={error} />
+      </div>
       <ButtonLink href="/docs" label="Documentation" />
     </div>
   );
