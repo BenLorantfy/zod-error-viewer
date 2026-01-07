@@ -620,12 +620,12 @@ function Line({
           <span style={{ color: theme.string }}>
             {`"`}
             {value.split("\n").map((line, idx, arr) => (
-              <>
+              <React.Fragment key={idx}>
                 {line}
                 {idx !== arr.length - 1 && (
                   <span style={{ color: theme.newline }}>{"↵"}</span>
                 )}
-              </>
+              </React.Fragment>
             ))}
             {`"`}
           </span>
